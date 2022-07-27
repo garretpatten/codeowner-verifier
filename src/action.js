@@ -23,7 +23,7 @@ function run() {
 	for (let codeownerLine of codeownersLines) {
 		// Filter out comments and blank lines
 		if (codeownerLine.substring(0,1) !== '#'
-			|| codeownerLine !== '') {
+			|| codeownerLine.length > 1) {
 			codeownersEntries.push(codeownerLine);
 		}
 	}
