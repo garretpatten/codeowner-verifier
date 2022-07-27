@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up node
+        uses: actions/setup-node@v3
+
+      - name: Install node modules
+        run: npm i --location=global
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
