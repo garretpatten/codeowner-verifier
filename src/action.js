@@ -6,11 +6,31 @@ const github = require('@actions/github');
 const fs = require('fs');
 
 /* I/O */
-const INPUT_README_PATH = 'codeownersPath';
-const OUTPUT_TIMESTAMP = 'time';
+const INPUT_CODEOWNERS_PATH = 'codeownersPath';
+const OUTPUT_TIMESTAMP = 'timestamp';
+
+const repoName = github.context.payload.repository.full_name.split('/')[1];
 
 function run() {
-	console.log('this is a test');
+	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
+
+	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
+
+	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
+	const codeownersLines = codeownersMetadata.split('\n');
+	const codeownersEntries = [];
+
+	for (let codeownerLine of codeownersLines) {
+		if (codeownerLine.substring(0,1) !== '#') {
+			codeownersEntries.add(codeownerLine);
+		}
+	}
+
+	console.log('These are the codeownersLines');
+	console.log(codeownersLines);
+	console.log('');
+	console.log('These are the codeownersEntries');
+	console.log(codeownersEntries);
 }
 
 run();
