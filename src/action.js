@@ -20,6 +20,7 @@ function isFilepathInCodeowners(filepath, codeownersFilepaths) {
 	return true;
 }
 
+// TODO: Rename function
 function run() {
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 

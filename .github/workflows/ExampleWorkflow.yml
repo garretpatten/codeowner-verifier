@@ -17,20 +17,13 @@ jobs:
 
       - name: Identify Changed Files
         id: diff
-        uses: tj-actions/verify-changed-files@v10.1
-        with:
-          files: |
-            *.js
-            *.py
-            *.ts
-            *.txt
-            *.yml
+        uses: jitterbit/get-changed-files@v1
 
       - name: Codeowners Validator
         id: codeownersValidator
         uses: garretpatten/codeowners-validator@main
         with:
-          changedFiles: ${{ steps.diff.outputs.changed_files }}
+          changedFiles: ${{ steps.diff.outputs.all }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
