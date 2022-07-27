@@ -20,4 +20,4 @@ outputs:
 # TODO: Update to run minified dist/index.js
 runs:
   using: 'node12'
-  main: 'action.js'
+  main: 'src/action.js'
