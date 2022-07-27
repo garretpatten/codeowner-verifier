@@ -31,6 +31,11 @@ function run() {
 	console.log('');
 	console.log('These are the codeownersEntries');
 	console.log(codeownersEntries);
+
+	core.setOutput(
+		OUTPUT_TIMESTAMP,
+		new Date().toTimeString()
+	);
 }
 
 run();
