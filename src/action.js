@@ -18,10 +18,12 @@ function run() {
 
 	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
 	const codeownersLines = codeownersMetadata.split('\n');
-	const codeownersEntries = [];
 
+	const codeownersEntries = [];
 	for (let codeownerLine of codeownersLines) {
-		if (codeownerLine.substring(0,1) !== '#') {
+		// Filter out comments and blank lines
+		if (codeownerLine.substring(0,1) !== '#'
+			|| codeownerLine !== '') {
 			codeownersEntries.push(codeownerLine);
 		}
 	}
