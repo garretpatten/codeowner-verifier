@@ -1,0 +1,30 @@
+name: 'Example Workflow'
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    step:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Identify Changed Files
+        run: echo "Identify Changed Files here"
+
+      - name: Codeowners Validator
+        id: codeownersValidator
+        uses: garretpatten/codeowners-validator@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Finish and Output Time
+        run: |
+          echo "Codeowners Validator has completed."
+          echo "Time: ${{ steps.codeownersValidator.outputs.timestamp }}"

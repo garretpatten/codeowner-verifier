@@ -1,0 +1,27 @@
+{
+  "name": "codeowners-validator",
+  "version": "1.0.0",
+  "description": "A GitHub Action to check changed files and ensure that codeowners and the individuals and Teams it points to are valid",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/action.js --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garretpatten/codeowners-validator.git"
+  },
+  "keywords": [],
+  "author": "Garret Patten",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/garretpatten/codeowners-validator/issues"
+  },
+  "homepage": "https://github.com/garretpatten/codeowners-validator#readme",
+  "dependencies": {
+    "@actions/core": "^1.9.0",
+    "@actions/github": "^5.0.3",
+    "@vercel/ncc": "^0.34.0",
+    "fs": "^0.0.1-security"
+  }
+}

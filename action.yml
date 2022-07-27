@@ -1,0 +1,22 @@
+name: 'Codeowners Validator'
+description: 'Validates Codeowners file'
+author: 'Garret Patten'
+
+# TODO: Add branding
+
+inputs:
+  codeownersPath:
+    description: 'The Codeowners path'
+    required: true
+    default: '.github/CODEOWNERS'
+  GITHUB_TOKEN:
+    description: 'GitHub Token'
+    required: true
+
+outputs:
+  timestamp:
+    description: 'Codeowners Validator timestamp'
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
