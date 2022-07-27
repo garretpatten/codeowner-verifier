@@ -17,6 +17,7 @@ outputs:
   timestamp:
     description: 'Codeowners Validator timestamp'
 
+# TODO: Update to run minified dist/index.js
 runs:
   using: 'node12'
-  main: 'dist/index.js'
+  main: 'action.js'

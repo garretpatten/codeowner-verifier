@@ -22,7 +22,7 @@ function run() {
 
 	for (let codeownerLine of codeownersLines) {
 		if (codeownerLine.substring(0,1) !== '#') {
-			codeownersEntries.add(codeownerLine);
+			codeownersEntries.push(codeownerLine);
 		}
 	}
 
