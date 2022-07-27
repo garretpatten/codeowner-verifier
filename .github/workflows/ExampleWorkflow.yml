@@ -19,11 +19,12 @@ jobs:
         id: diff
         uses: tj-actions/verify-changed-files@v10.1
           with:
-            *.js
-            *.py
-            *.ts
-            *.txt
-            *.yml
+            files: |
+              *.js
+              *.py
+              *.ts
+              *.txt
+              *.yml
 
       - name: Codeowners Validator
         id: codeownersValidator
