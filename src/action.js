@@ -45,9 +45,10 @@ function run() {
 	];
 	const diffFiles = [
 		'/src/action.js',
-		'LICENSE',
-		'.github/workflows/ExampleWorkflow.yml'
+		'/LICENSE',
+		'/.github/workflows/ExampleWorkflow.yml'
 	];
+	const validTeams = [ '@garretpatten' ];
 
 	let codeownerEntry;
 	const codeownersMap = new Map();
@@ -62,6 +63,10 @@ function run() {
 			);
 		}
 	}
+
+	console.log('codeownersMap');
+	console.log(codeownersMap);
+	console.log('');
 
 	/* TODO:
 		- Iterate through changed files
@@ -88,8 +93,16 @@ function run() {
 		  individual is found, then
 		  the check should fail
 	*/
-	for (let key of codeownersMap) {
+	let owner;
+	for (let key of codeownersMap.keys()) {
+		owner = codeownersMap.get(key);
+		if (!validTeams.includes(owner)) {
+			let errorMessage = 'The owner ' + owner + ' is not a valid GitHub Team. ';
+			errorMessage += 'Resolve the codeowners entry for ' + key;
+			// core.setFailed(errorMessage);
 
+			console.log(errorMessage);
+		}
 	}
 
 	/*
