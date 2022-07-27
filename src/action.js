@@ -26,6 +26,10 @@ function run() {
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
 	const changedFiles = core.getInput(INPUT_CHANGED_FILES);
 
+	console.log('inputs');
+	console.log(codeownersPath);
+	console.log(changedFiles);
+
 	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
 	const codeownersLines = codeownersMetadata.split('\n');
 
@@ -42,6 +46,9 @@ function run() {
 				);
 		}
 	}
+
+	console.log('codeownersMap');
+	console.log(codeownersMap);
 
 	/* TODO:
 		- Iterate through changed files
