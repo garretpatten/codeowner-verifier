@@ -9,6 +9,10 @@ inputs:
     description: 'The Codeowners path'
     required: true
     default: '.github/CODEOWNERS'
+  changedFiles:
+    description: 'Updated files included in the PR or Push'
+    required: true;
+    default: null
   GITHUB_TOKEN:
     description: 'GitHub Token'
     required: true
