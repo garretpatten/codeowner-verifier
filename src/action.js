@@ -20,12 +20,13 @@ function isFilepathInCodeowners(filepath, codeownersFilepaths) {
 	return true;
 }
 
-// TODO: Rename function
-function run() {
+function validateCodeowners() {
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
 	const changedFiles = core.getInput(INPUT_CHANGED_FILES);
+	// TODO: Hit GitHub API to get valid teams
+	const validTeams = [];
 
 	console.log('inputs');
 	console.log(codeownersPath);
@@ -75,8 +76,14 @@ function run() {
 			individual is found, then
 			the check should fail
 	*/
-	for (let key of codeownersMap) {
-
+	let owner;
+	for (let key of codeownersMap.keys()) {
+		owner = codeownersMap.get(key);
+		if (!validTeams.includes(owner)) {
+			let errorMessage = 'The owner ' + owner + ' is not a valid GitHub Team. ';
+			errorMessage += 'Resolve the codeowners entry for ' + key;
+			// core.setFailed(errorMessage);
+		}
 	}
 
 	core.setOutput(
@@ -85,4 +92,4 @@ function run() {
 	);
 }
 
-run();
+validateCodeowners();
