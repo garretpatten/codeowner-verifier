@@ -3,6 +3,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 /* Node Dependencies */
+const glob = require('glob');
 const fs = require('fs');
 
 /* I/O */
@@ -10,15 +11,22 @@ const INPUT_CODEOWNERS_PATH = 'codeownersPath';
 const INPUT_CHANGED_FILES = 'changedFiles';
 const OUTPUT_TIMESTAMP = 'timestamp';
 
+const matchedFiles = [];
+
 // const repoName = github.context.payload.repository.full_name.split('/')[1];
 
-// TODO: Determine if given filepath has
-// a corresponding codeowners entry
-function isFilepathInCodeowners(filepath, codeownersFilepaths) {
-	console.log('isFilepathInCodeowners has been called with:');
-	console.log(filepath);
-	if (filepath == 'LICENSE') { return false; }
-	else { return true; }
+// Remove '/' as first character
+// and add '*' on directories
+function cleanPath(filepath) {
+	if (filepath.substring(0, 1) == '/') {
+		filepath = filepath.substring(1);
+	}
+
+	if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
+		filepath += '*';
+	}
+
+	return filepath;
 }
 
 function run() {
@@ -38,7 +46,7 @@ function run() {
 		'/.github/* @garretpatten',
 		'',
 		'# This should lead to an error',
-		'/dist/* @aldjkdjflsd-jsdjflsdkf',
+		'/dist/ @aldjkdjflsd-jsdjflsdkf',
 		'',
 		'# This should be validated',
 		'**/action.js @garretpatten'
@@ -50,6 +58,12 @@ function run() {
 	];
 	const validTeams = [ '@garretpatten' ];
 
+	const cleanFiles = [
+		'src/action.js',
+		'dist/index.js',
+		'not/aMatch.xml'
+	];
+
 	let codeownerEntry;
 	const codeownersMap = new Map();
 	for (let codeownerLine of codeownersLines) {
@@ -57,6 +71,10 @@ function run() {
 		if (codeownerLine.substring(0,1) !== '#'
 			&& codeownerLine.length > 1) {
 			codeownerEntry = codeownerLine.split(' ');
+
+			// TODO: Clean file path
+			codeownerEntry[0] = cleanPath(codeownerEntry[0]);
+
 			codeownersMap.set(
 				codeownerEntry[0],
 				codeownerEntry[1]
@@ -76,13 +94,19 @@ function run() {
 	*/
 	const codeownersFilepaths = codeownersMap.keys();
 	// const diffFiles = [];
-	for (let filepath of diffFiles) {
-		if (!isFilepathInCodeowners(filepath, codeownersFilepaths)) {
-			// core.setFailed('Updates have been made that do not have a corresponding codeowners entry');
-			console.log('An updated filepath has been found that is not in the CODEOWNERS file');
-			console.log(filepath);
-		}
+	for (let filepathPattern of codeownersFilepaths) {
+		console.log('calling glob with: ' + filepathPattern);
+		glob(
+			filepathPattern,
+			function(err, files) {
+				if (err) { console.log(err); }
+				matchedFiles.push([...files]);
+			}
+		)
 	}
+
+	console.log('glob has completed');
+	console.log(matchedFiles);
 
 	/* TODO:
 		- Iterate through the codeownersMap

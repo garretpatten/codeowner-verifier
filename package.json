@@ -22,6 +22,7 @@
     "@actions/core": "^1.9.0",
     "@actions/github": "^5.0.3",
     "@vercel/ncc": "^0.34.0",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "glob": "^8.0.3"
   }
 }
