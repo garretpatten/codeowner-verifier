@@ -3,7 +3,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 /* Node Dependencies */
-const fnMatch = require('fnMatch');
+// const fnMatch = require('fnMatch');
 const fs = require('fs');
 
 /* I/O */
