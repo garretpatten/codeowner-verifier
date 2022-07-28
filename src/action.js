@@ -93,35 +93,30 @@ function run() {
 		  in the codeownersFilepaths, then the
 		  check should fail
 	*/
-	const codeownersFilepaths = codeownersMap.keys();
+	console.log('');
+	console.log('');
+	console.log('');
+	console.log('');
+	const codeownersFilepaths = [...codeownersMap.keys()];
 	// const diffFiles = [];
-	const matches = [];
-	for (let filepathPattern of codeownersFilepaths) {
-		/*
-		console.log('calling glob with: ' + filepathPattern);
-		glob(
-			filepathPattern,
-			function(err, files) {
-				if (err) { console.log(err); }
-				matchedFiles.push([...files]);
-			}
-		)
-		*/
-		cleanFiles.forEach((filepath) => {
-			console.log('testing minimatch with: ')
-			console.log(filepathPattern);
-			console.log(filepath);
+	const changedFilesWithoutOwnership = [...cleanFiles];
+	console.log(codeownersFilepaths);
+	console.log(cleanFiles);
+	for (let filepath of cleanFiles) {
+		codeownersFilepaths.forEach((filepathPattern) => {
 			if (minimatch(filepath, filepathPattern)) {
-				console.log('a match has been found for: ');
-				console.log(filepathPattern);
-				console.log(filepath);
-				matches.push(filepath);
-			} else {
-				console.log('not a match');
+				changedFilesWithoutOwnership.splice(
+					changedFilesWithoutOwnership.indexOf(
+						filepath
+					),
+					1
+				);
 			}
 		});
 	}
-	console.log(matches);
+
+	console.log(cleanFiles);
+	console.log(changedFilesWithoutOwnership);
 
 	/* TODO:
 		- Iterate through the codeownersMap
