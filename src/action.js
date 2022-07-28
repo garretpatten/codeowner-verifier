@@ -1,6 +1,7 @@
 /* GitHub Dependencies */
 const core = require('@actions/core');
 const github = require('@actions/github');
+const { Octokit } = require('@octokit/core');
 
 /* Node Dependencies */
 const fs = require('fs');
@@ -11,7 +12,7 @@ const INPUT_CODEOWNERS_PATH = 'codeownersPath';
 const INPUT_CHANGED_FILES = 'changedFiles';
 const OUTPUT_TIMESTAMP = 'timestamp';
 
-const repoName = github.context.payload.repository.full_name.split('/')[1];
+// const repoName = github.context.payload.repository.full_name.split('/')[1];
 
 function buildCodeownersMap(codeownersLines) {
 	let codeownerEntry;
@@ -62,7 +63,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 					1
 				);
 			}
-		});
+		});j
 	}
 
 	return changedFilesWithoutOwnership;
@@ -73,25 +74,25 @@ function getCodeowners(codeownerEntry) {
 	return [...codeownerEntry];
 }
 
+async function getTeams() {
+	// TODO: Figure out a way to pass a valid token through
+	const response = await new Octokit(
+		{ auth: GITHUB_TOKEN }
+	).request('GET /orgs/ncino/teams');
+	console.log(response);
+}
+
 function validateCodeowners() {
+	/*
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 
-	// TODO: Hit GitHub API to get valid teams
-	const octokit = new OctoKit({
-		auth: 'personal-access-token'
-	});
-
-	const validTeams = await octokit.request(
-		'GET /orgs/ncino/teams',
-		{
-			org: 'ORG'
-		}
-	);
-
+	*/
+	getTeams();
+/*
 	console.log(validTeams);
 
 	console.log('');
@@ -114,15 +115,14 @@ function validateCodeowners() {
 	console.log('Changed files without ownership in this commit:');
 	console.log(changedFilesWithoutOwnership);
 
-	/* TODO:
-		- Iterate through the codeownersMap
-		- Ensure that every filepath is
-			pointing to a valid GitHub
-			Team or individual
-		- If an invalid GitHub Team or
-			individual is found, then
-			the check should fail
-	*/
+	// TODO:
+	//	- Iterate through the codeownersMap
+	//	- Ensure that every filepath is
+	//		pointing to a valid GitHub
+	//		Team or individual
+	//	- If an invalid GitHub Team or
+	//		individual is found, then
+	//		the check should fail
 	let owners;
 	for (let key of codeownersMap.keys()) {
 		owners = codeownersMap.get(key);
@@ -131,19 +131,13 @@ function validateCodeowners() {
 
 		console.log('valid teams are');
 		console.log(validTeams);
-		/*
-		if (!validTeams.includes(owners)) {
-			let errorMessage = 'The owner ' + owner + ' is not a valid GitHub Team. ';
-			errorMessage += 'Resolve the codeowners entry for ' + key;
-			// core.setFailed(errorMessage);
-		}
-		*/
 	}
 
 	core.setOutput(
 		OUTPUT_TIMESTAMP,
 		new Date().toTimeString()
 	);
+	*/
 }
 
 validateCodeowners();
