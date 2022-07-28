@@ -8,12 +8,16 @@ const fs = require('fs');
 const minimatch = require('minimatch');
 
 /* I/O */
+const INPUT_API_TOKEN = 'apiToken';
 const INPUT_CODEOWNERS_PATH = 'codeownersPath';
 const INPUT_CHANGED_FILES = 'changedFiles';
 const OUTPUT_TIMESTAMP = 'timestamp';
 
-// const repoName = github.context.payload.repository.full_name.split('/')[1];
-
+/*
+ * Builds a Map<String, String[]> of
+ * filepath to codeowners of that filepath
+ * as indicated by the CODEOWNERS file
+ */
 function buildCodeownersMap(codeownersLines) {
 	let codeownerEntry;
 	const codeownersMap = new Map();
@@ -21,11 +25,10 @@ function buildCodeownersMap(codeownersLines) {
 		// Filter out comments and blank lines
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1) {
+				// Split filepath from owners
 				codeownerEntry = codeownerLine.split(' ');
-
-				// TODO: Clean file path
+				// Clean file path
 				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
-
 				codeownersMap.set(
 					codeownerEntry[0],
 					getCodeowners(codeownerEntry)
@@ -36,13 +39,19 @@ function buildCodeownersMap(codeownersLines) {
 	return codeownersMap;
 }
 
+/*
+ * Cleans CODEOWNERS filepaths to
+ * facilitate filepattern/filepath
+ * matching. Filepaths that start
+ * with '/' will have them removed,
+ * and directory paths that end in '/'
+ * will have a '*' added.
+ */
 function cleanPath(filepath) {
-	// Remove '/' as first character
 	if (filepath.substring(0, 1) == '/') {
 		filepath = filepath.substring(1);
 	}
 
-	// Add '*' on directories
 	if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
 		filepath += '*';
 	}
@@ -50,6 +59,12 @@ function cleanPath(filepath) {
 	return filepath;
 }
 
+/*
+ * Generates a list of files that have
+ * been changed in the commit in context
+ * that do not have a corresponding entry
+ * in the CODEOWNERS file.
+ */
 function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
 	const changedFilesWithoutOwnership = [...changedFiles];
@@ -69,30 +84,45 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 	return changedFilesWithoutOwnership;
 }
 
+/*
+ * Returns a list of codeowners given
+ * an entry in the CODEOWNERS file.
+ */
 function getCodeowners(codeownerEntry) {
 	codeownerEntry.splice(0, 1);
 	return [...codeownerEntry];
 }
 
-async function getTeams() {
-	// TODO: Figure out a way to pass a valid token through
+async function getTeams(token) {
 	const response = await new Octokit(
-		{ auth: GITHUB_TOKEN }
+		{ auth: token }
 	).request('GET /orgs/ncino/teams');
 	console.log(response);
+	for (let team of response.data) {
+		validTeams.push(team.name);
+	}
 }
 
+/*
+ * Orchestrates this GitHub Action which
+ * ensures that the commit in context
+ * achieves a valid CODEOWNERS state.
+ */
 function validateCodeowners() {
-	/*
+	const validTeams = null;
+
+	const repoName = github.context.payload.repository.full_name.split('/')[1];
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
+	const apiToken = core.getInput(INPUT_API_TOKEN);
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 
-	*/
-	getTeams();
-/*
+	if (apiToken != null) {
+		getTeams(apiToken);
+	}
+
 	console.log(validTeams);
 
 	console.log('');
@@ -115,29 +145,31 @@ function validateCodeowners() {
 	console.log('Changed files without ownership in this commit:');
 	console.log(changedFilesWithoutOwnership);
 
-	// TODO:
-	//	- Iterate through the codeownersMap
-	//	- Ensure that every filepath is
-	//		pointing to a valid GitHub
-	//		Team or individual
-	//	- If an invalid GitHub Team or
-	//		individual is found, then
-	//		the check should fail
-	let owners;
-	for (let key of codeownersMap.keys()) {
-		owners = codeownersMap.get(key);
+	if (validTeams != null) {
+		let invalidTeams = [];
+		let owners;
+		for (let key of codeownersMap.keys()) {
+			owners = codeownersMap.get(key);
+			owners.forEach((owner) => {
+				if (!validTeams.includes(owner)) {
+					invalidTeams.push(owner);
+				}
+			});
+		}
 
-		// TODO: Determine if owners are valid
-
-		console.log('valid teams are');
-		console.log(validTeams);
+		if (invalidTeams.length > 0) {
+			let errorMessage = 'There are invalid Teams in the CODEOWNERS file: ';
+			invalidTeams.forEach((team) => {
+				errorMessage += team + ' '
+			})
+			core.setFailed(errorMessage);
+		}
 	}
 
 	core.setOutput(
 		OUTPUT_TIMESTAMP,
 		new Date().toTimeString()
 	);
-	*/
 }
 
 validateCodeowners();
