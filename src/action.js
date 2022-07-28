@@ -37,8 +37,8 @@ function validateCodeowners() {
 	// TODO: Hit GitHub API to get valid teams
 	const validTeams = [];
 
-	console.log('inputs');
-	console.log(codeownersPath);
+	console.log('');
+	console.log('Changed files in this commit:');
 	console.log(changedFiles);
 
 	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
@@ -77,6 +77,8 @@ function validateCodeowners() {
 		});
 	}
 
+	console.log('');
+	console.log('Changed files without ownership in this commit:');
 	console.log(changedFilesWithoutOwnership);
 
 	/* TODO:
