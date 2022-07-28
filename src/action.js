@@ -50,16 +50,7 @@ function validateCodeowners() {
 		}
 	}
 
-	console.log('codeownersMap');
-	console.log(codeownersMap);
-
-	/* TODO:
-		- Iterate through changed files
-		- If a changed file is identified that is not
-		  in the codeownersFilepaths, then the
-		  check should fail
-	*/
-	const codeownersFilepaths = codeownersMap.keys();
+	const codeownersFilepaths = [...codeownersMap.keys()];
 	const changedFilesWithoutOwnership = [...changedFiles];
 	for (let filepath of changedFiles) {
 		codeownersFilepaths.forEach((filepathPattern) => {
@@ -74,7 +65,6 @@ function validateCodeowners() {
 		});
 	}
 
-	console.log(changedFiles);
 	console.log(changedFilesWithoutOwnership);
 
 	/* TODO:
