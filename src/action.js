@@ -81,7 +81,18 @@ function validateCodeowners() {
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 
 	// TODO: Hit GitHub API to get valid teams
-	const validTeams = [];
+	const octokit = new OctoKit({
+		auth: 'personal-access-token'
+	});
+
+	const validTeams = await octokit.request(
+		'GET /orgs/ncino/teams',
+		{
+			org: 'ORG'
+		}
+	);
+
+	console.log(validTeams);
 
 	console.log('');
 	console.log('Changed files in this commit:');
@@ -91,6 +102,7 @@ function validateCodeowners() {
 	const codeownersLines = codeownersMetadata.split('\n');
 
 	const codeownersMap = buildCodeownersMap(codeownersLines);
+	console.log('');
 	console.log(codeownersMap);
 
 	const changedFilesWithoutOwnership = getChangedFilesWithoutOwnership(
@@ -111,14 +123,21 @@ function validateCodeowners() {
 			individual is found, then
 			the check should fail
 	*/
-	let owner;
+	let owners;
 	for (let key of codeownersMap.keys()) {
-		owner = codeownersMap.get(key);
-		if (!validTeams.includes(owner)) {
+		owners = codeownersMap.get(key);
+
+		// TODO: Determine if owners are valid
+
+		console.log('valid teams are');
+		console.log(validTeams);
+		/*
+		if (!validTeams.includes(owners)) {
 			let errorMessage = 'The owner ' + owner + ' is not a valid GitHub Team. ';
 			errorMessage += 'Resolve the codeowners entry for ' + key;
 			// core.setFailed(errorMessage);
 		}
+		*/
 	}
 
 	core.setOutput(
