@@ -2,7 +2,7 @@
 /.github/* @garretpatten
 
 # This should lead to an error
-/dist/ @aldjkdjflsd-jsdjflsdkf
+/dist/ @aldjkdjflsd-jsdjflsdkf @JakeSpillane
 
 # This should be validated
 **/action.js @garretpatten

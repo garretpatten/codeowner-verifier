@@ -27,7 +27,7 @@ function buildCodeownersMap(codeownersLines) {
 
 				codeownersMap.set(
 					codeownerEntry[0],
-					codeownerEntry[1]
+					getCodeowners(codeownerEntry)
 				);
 		}
 	}
@@ -68,6 +68,11 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 	return changedFilesWithoutOwnership;
 }
 
+function getCodeowners(codeownerEntry) {
+	codeownerEntry.splice(0, 1);
+	return [...codeownerEntry];
+}
+
 function validateCodeowners() {
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
@@ -86,6 +91,7 @@ function validateCodeowners() {
 	const codeownersLines = codeownersMetadata.split('\n');
 
 	const codeownersMap = buildCodeownersMap(codeownersLines);
+	console.log(codeownersMap);
 
 	const changedFilesWithoutOwnership = getChangedFilesWithoutOwnership(
 		changedFiles,
