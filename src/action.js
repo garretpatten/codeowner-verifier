@@ -13,6 +13,28 @@ const OUTPUT_TIMESTAMP = 'timestamp';
 
 const repoName = github.context.payload.repository.full_name.split('/')[1];
 
+function buildCodeownersMap(codeownersLines) {
+	let codeownerEntry;
+	const codeownersMap = new Map();
+	for (let codeownerLine of codeownersLines) {
+		// Filter out comments and blank lines
+		if (codeownerLine.substring(0,1) != '#'
+			&& codeownerLine.length > 1) {
+				codeownerEntry = codeownerLine.split(' ');
+
+				// TODO: Clean file path
+				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
+
+				codeownersMap.set(
+					codeownerEntry[0],
+					codeownerEntry[1]
+				);
+		}
+	}
+
+	return codeownersMap;
+}
+
 function cleanPath(filepath) {
 	// Remove '/' as first character
 	if (filepath.substring(0, 1) == '/') {
@@ -25,6 +47,25 @@ function cleanPath(filepath) {
 	}
 
 	return filepath;
+}
+
+function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
+	const codeownersFilepaths = [...codeownersMap.keys()];
+	const changedFilesWithoutOwnership = [...changedFiles];
+	for (let filepath of changedFiles) {
+		codeownersFilepaths.forEach((filepathPattern) => {
+			if (minimatch(filepath, filepathPattern)) {
+				changedFilesWithoutOwnership.splice(
+					changedFilesWithoutOwnership.indexOf(
+						filepath
+					),
+					1
+				);
+			}
+		});
+	}
+
+	return changedFilesWithoutOwnership;
 }
 
 function validateCodeowners() {
@@ -44,38 +85,12 @@ function validateCodeowners() {
 	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
 	const codeownersLines = codeownersMetadata.split('\n');
 
-	let codeownerEntry;
-	const codeownersMap = new Map();
-	for (let codeownerLine of codeownersLines) {
-		// Filter out comments and blank lines
-		if (codeownerLine.substring(0,1) != '#'
-			&& codeownerLine.length > 1) {
-				codeownerEntry = codeownerLine.split(' ');
+	const codeownersMap = buildCodeownersMap(codeownersLines);
 
-				// TODO: Clean file path
-				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
-
-				codeownersMap.set(
-					codeownerEntry[0],
-					codeownerEntry[1]
-				);
-		}
-	}
-
-	const codeownersFilepaths = [...codeownersMap.keys()];
-	const changedFilesWithoutOwnership = [...changedFiles];
-	for (let filepath of changedFiles) {
-		codeownersFilepaths.forEach((filepathPattern) => {
-			if (minimatch(filepath, filepathPattern)) {
-				changedFilesWithoutOwnership.splice(
-					changedFilesWithoutOwnership.indexOf(
-						filepath
-					),
-					1
-				);
-			}
-		});
-	}
+	const changedFilesWithoutOwnership = getChangedFilesWithoutOwnership(
+		changedFiles,
+		codeownersMap
+	);
 
 	console.log('');
 	console.log('Changed files without ownership in this commit:');
