@@ -3,8 +3,9 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 /* Node Dependencies */
-const glob = require('glob');
 const fs = require('fs');
+const glob = require('glob');
+const minimatch = require('minimatch');
 
 /* I/O */
 const INPUT_CODEOWNERS_PATH = 'codeownersPath';
@@ -94,7 +95,9 @@ function run() {
 	*/
 	const codeownersFilepaths = codeownersMap.keys();
 	// const diffFiles = [];
+	const matches = [];
 	for (let filepathPattern of codeownersFilepaths) {
+		/*
 		console.log('calling glob with: ' + filepathPattern);
 		glob(
 			filepathPattern,
@@ -103,10 +106,22 @@ function run() {
 				matchedFiles.push([...files]);
 			}
 		)
+		*/
+		cleanFiles.forEach((filepath) => {
+			console.log('testing minimatch with: ')
+			console.log(filepathPattern);
+			console.log(filepath);
+			if (minimatch(filepath, filepathPattern)) {
+				console.log('a match has been found for: ');
+				console.log(filepathPattern);
+				console.log(filepath);
+				matches.push(filepath);
+			} else {
+				console.log('not a match');
+			}
+		});
 	}
-
-	console.log('glob has completed');
-	console.log(matchedFiles);
+	console.log(matches);
 
 	/* TODO:
 		- Iterate through the codeownersMap
