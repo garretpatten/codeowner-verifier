@@ -78,7 +78,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 					1
 				);
 			}
-		});j
+		});
 	}
 
 	return changedFilesWithoutOwnership;
