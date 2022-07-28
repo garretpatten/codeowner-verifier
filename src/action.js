@@ -5,8 +5,8 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 /* Node Dependencies */
-// const fnMatch = require('fnMatch');
 const fs = require('fs');
+const minimatch = require('minimatch');
 
 /* I/O */
 const INPUT_CODEOWNERS_PATH = 'codeownersPath';
@@ -14,14 +14,6 @@ const INPUT_CHANGED_FILES = 'changedFiles';
 const OUTPUT_TIMESTAMP = 'timestamp';
 
 const repoName = github.context.payload.repository.full_name.split('/')[1];
-
-// TODO: Determine if given filepath has
-// a corresponding codeowners entry
-function isFilepathInCodeowners(filepath, codeownersFilepaths) {
-	console.log('isFilepathInCodeowners has been called with:');
-	console.log(filepath);
-	return true;
-}
 
 function validateCodeowners() {
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
@@ -68,13 +60,22 @@ function validateCodeowners() {
 		  check should fail
 	*/
 	const codeownersFilepaths = codeownersMap.keys();
+	const changedFilesWithoutOwnership = [...changedFiles];
 	for (let filepath of changedFiles) {
-		if (!isFilepathInCodeowners(filepath, codeownersFilepaths)) {
-			// core.setFailed('Updates have been made that do not have a corresponding codeowners entry');
-			console.log('An updated filepath has been found that is not in the CODEOWNERS file');
-			console.log(filepath);
-		}
+		codeownersFilepaths.forEach((filepathPattern) => {
+			if (minimatch(filepath, filepathPattern)) {
+				changedFilesWithoutOwnership.splice(
+					changedFilesWithoutOwnership.indexOf(
+						filepath
+					),
+					1
+				);
+			}
+		});
 	}
+
+	console.log(changedFiles);
+	console.log(changedFilesWithoutOwnership);
 
 	/* TODO:
 		- Iterate through the codeownersMap
