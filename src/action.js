@@ -3,6 +3,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 /* Node Dependencies */
+const fnMatch = require('fnMatch');
 const fs = require('fs');
 
 /* I/O */
@@ -11,6 +12,20 @@ const INPUT_CHANGED_FILES = 'changedFiles';
 const OUTPUT_TIMESTAMP = 'timestamp';
 
 const repoName = github.context.payload.repository.full_name.split('/')[1];
+
+// Remove '/' as first character
+// and add '*' on directories
+function cleanPath(filepath) {
+	if (filepath.substring(0, 1) == '/') {
+		filepath = filepath.substring(1);
+	}
+
+	if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
+		filepath += '*';
+	}
+
+	return filepath;
+}
 
 // TODO: Determine if given filepath has
 // a corresponding codeowners entry
@@ -24,7 +39,9 @@ function validateCodeowners() {
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
-	const changedFiles = core.getInput(INPUT_CHANGED_FILES);
+	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
+	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
+
 	// TODO: Hit GitHub API to get valid teams
 	const validTeams = [];
 
@@ -39,9 +56,13 @@ function validateCodeowners() {
 	const codeownersMap = new Map();
 	for (let codeownerLine of codeownersLines) {
 		// Filter out comments and blank lines
-		if (codeownerLine.substring(0,1) !== '#'
+		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1) {
 				codeownerEntry = codeownerLine.split(' ');
+
+				// TODO: Clean file path
+				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
+
 				codeownersMap.set(
 					codeownerEntry[0],
 					codeownerEntry[1]
