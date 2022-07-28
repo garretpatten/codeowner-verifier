@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  codeowners-validator-workflow:
 
     runs-on: ubuntu-latest
 
