@@ -43,20 +43,24 @@ function buildCodeownersMap(codeownersLines) {
  * matching. Filepaths that start
  * with '/' will have them removed,
  * and directory paths that end in '/'
- * will have a '*' added.
+ * will have a '*' added. The all
+ * encompassing '/*' filepath will
+ * be unaltered.
  */
 function cleanPath(filepath) {
-	/*
-	if (filepath.substring(0, 1) == '/') {
-		filepath = filepath.substring(1);
-	}
-	*/
+	if (filepath == '/*') {
+		return filepath
+	} else {
+		if (filepath.substring(0, 1) == '/') {
+			filepath = filepath.substring(1);
+		}
 
-	if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
-		filepath += '*';
-	}
+		if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
+			filepath += '*';
+		}
 
-	return filepath;
+		return filepath;
+	}
 }
 
 /*
