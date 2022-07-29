@@ -21,13 +21,11 @@ const OUTPUT_TIMESTAMP = 'timestamp';
 function buildCodeownersMap(codeownersLines) {
 	let codeownerEntry;
 	const codeownersMap = new Map();
+
 	for (let codeownerLine of codeownersLines) {
-		// Filter out comments and blank lines
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1) {
-				// Split filepath from owners
 				codeownerEntry = codeownerLine.split(' ');
-				// Clean file path
 				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
 				codeownersMap.set(
 					codeownerEntry[0],
@@ -48,9 +46,11 @@ function buildCodeownersMap(codeownersLines) {
  * will have a '*' added.
  */
 function cleanPath(filepath) {
+	/*
 	if (filepath.substring(0, 1) == '/') {
 		filepath = filepath.substring(1);
 	}
+	*/
 
 	if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
 		filepath += '*';
@@ -68,6 +68,7 @@ function cleanPath(filepath) {
 function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
 	const changedFilesWithoutOwnership = [...changedFiles];
+
 	for (let filepath of changedFiles) {
 		codeownersFilepaths.forEach((filepathPattern) => {
 			if (minimatch(filepath, filepathPattern)) {
@@ -90,6 +91,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
  */
 function getCodeowners(codeownerEntry) {
 	codeownerEntry.splice(0, 1);
+
 	return [...codeownerEntry];
 }
 
@@ -97,7 +99,9 @@ async function getTeams(token) {
 	const response = await new Octokit(
 		{ auth: token }
 	).request('GET /orgs/ncino/teams');
+
 	console.log(response);
+
 	for (let team of response.data) {
 		validTeams.push(team.name);
 	}
@@ -148,6 +152,7 @@ function validateCodeowners() {
 	if (validTeams != null) {
 		let invalidTeams = [];
 		let owners;
+
 		for (let key of codeownersMap.keys()) {
 			owners = codeownersMap.get(key);
 			owners.forEach((owner) => {
@@ -159,9 +164,11 @@ function validateCodeowners() {
 
 		if (invalidTeams.length > 0) {
 			let errorMessage = 'There are invalid Teams in the CODEOWNERS file: ';
+
 			invalidTeams.forEach((team) => {
 				errorMessage += team + ' '
 			})
+
 			core.setFailed(errorMessage);
 		}
 	}
