@@ -76,9 +76,9 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 	for (let filepath of changedFiles) {
 		codeownersFilepaths.forEach((filepathPattern) => {
 			if (minimatch(filepath, filepathPattern)
-				|| filePattern.indexOf('*') != -1
-				&& filepath.substring(0, filePattern.indexOf('*'))
-				== filePattern.substring(0, filePattern.indexOf('*'))) {
+				|| filepathPattern.indexOf('*') != -1
+				&& filepath.substring(0, filepathPattern.indexOf('*'))
+				== filepathPattern.substring(0, filepathPattern.indexOf('*'))) {
 				changedFilesWithoutOwnership.splice(
 					changedFilesWithoutOwnership.indexOf(
 						filepath
