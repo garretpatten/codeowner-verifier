@@ -81,7 +81,6 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 				return [];
 			}
 
-
 			if (minimatch(filepath, filepathPattern)
 				|| filepathPattern.indexOf('*') != -1
 				&& filepath.substring(0, filepathPattern.indexOf('*'))
