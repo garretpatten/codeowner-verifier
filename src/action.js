@@ -82,12 +82,15 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 			}
 
 			if (isMatch(filepath, filepathPattern)) {
+				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
+				console.log(changedFilesWithoutOwnership);
 				changedFilesWithoutOwnership.splice(
 					changedFilesWithoutOwnership.indexOf(
 						filepath
 					),
 					1
 				);
+				console.log(changedFilesWithoutOwnership);
 			}
 		});
 	}
