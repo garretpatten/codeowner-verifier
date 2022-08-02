@@ -1,7 +1,7 @@
 {
   "name": "codeowners-validator",
   "version": "1.0.0",
-  "description": "A GitHub Action to check changed files and ensure that codeowners and the individuals and Teams it points to are valid",
+  "description": "A GitHub Action to validate the ownership and Teams within a CODEOWNERS file",
   "main": "src/action.js",
   "scripts": {
     "build": "ncc build src/action.js --minify",
