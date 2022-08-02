@@ -143,9 +143,9 @@ function isMatch(filepath, filepathPattern) {
 		let filepathSplit = filepath.split('/');
 		let fileDirectory = filepathSplit[filepathSplit.length - 2];
 		return filepathPattern.includes(fileDirectory);
+	} else {
+		return false;
 	}
-
-	return false;
 }
 
 /*
