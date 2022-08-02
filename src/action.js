@@ -80,7 +80,13 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 
 	for (let filepath of changedFiles) {
 		codeownersFilepaths.forEach((filepathPattern) => {
-			if (minimatch(filepath, filepathPattern)) {
+			// Universal filepath means that all
+			// files in the commit are owned
+			if (filepathPattern == '/*') {
+				return [];
+			}
+
+			if (isMatch(filepath, filepathPattern)) {
 				changedFilesWithoutOwnership.splice(
 					changedFilesWithoutOwnership.indexOf(
 						filepath
@@ -114,6 +120,17 @@ async function getTeams(token) {
 	for (let team of response.data) {
 		validTeams.push(team.name);
 	}
+}
+
+function isMatch(filepath, filepathPattern) {
+	if (minimatch(filepath, filepathPattern)) {
+		return true;
+	} else if (filepathPattern.indexOf('/*') !== -1) {
+		return filepath.substring(0, filepathPattern.indexOf('*'))
+			== filepathPattern.substring(0, filepathPattern.indexOf('*'));
+	}
+
+	return false;
 }
 
 function validateCodeowners() {
@@ -155,7 +172,7 @@ function validateCodeowners() {
 		'**/action.js @garretpatten',
 		'',
 		'# This should be validated',
-		'/src/nSECURE/juice-shop/*'
+		'/src/nSECURE/juice-shop/* @garretpatten'
 	];
 
 	const changedFiles = [
