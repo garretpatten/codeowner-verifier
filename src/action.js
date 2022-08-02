@@ -81,15 +81,21 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 				return [];
 			}
 
+			let index;
 			if (isMatch(filepath, filepathPattern)) {
 				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
 				console.log(changedFilesWithoutOwnership);
-				changedFilesWithoutOwnership.splice(
-					changedFilesWithoutOwnership.indexOf(
-						filepath
-					),
-					1
-				);
+				index = changedFilesWithoutOwnership.indexOf(filepath);
+				if (changedFilesWithoutOwnership[index] == filepath) {
+					changedFilesWithoutOwnership.splice(
+						changedFilesWithoutOwnership.indexOf(
+							filepath
+						),
+						1
+					);
+				} else {
+					console.log('there was an indexing issue');
+				}
 				console.log(changedFilesWithoutOwnership);
 			}
 		});
