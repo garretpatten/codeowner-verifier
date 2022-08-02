@@ -178,6 +178,7 @@ function validateCodeowners() {
 	const changedFiles = [
 		'src/action.js',
 		'LICENSE',
+		'package.json',
 		'.github/workflows/ExampleWorkflow.yml',
 		'src/nSECURE/juice-shop/objects/Email__c.field-meta.xml'
 	];
