@@ -1,9 +1,24 @@
-# This should be validated
-/.github/* @garretpatten
+# This CODEOWNERS file illustrates the different, valid
+# filepath patterns that can be used in order to test
+# the expected behavior of the GitHub Action.
 
-# This should lead to an error
-/dist/ @aldjkdjflsd-jsdjflsdkf @JakeSpillane
-src/* @garretpatten
+# Universal Owner of all files
+# * @God
 
-# This should be validated
-**/action.js @garretpatten
+# Owner of all js files
+*.js @jsOwner
+
+# Owner of all files in a directory
+/node_modules/ @nodeOwner
+
+# Owner of all files in a hidden directory
+/.github/ @githubOwner
+
+# Owner of all files in the first level of a directory
+src/* @srcOwnerFirstLevel
+
+# Owner of a subdirectory anywhere
+objects/ @objectsOwner
+
+# Valid syntax for unowned file
+LICENSE

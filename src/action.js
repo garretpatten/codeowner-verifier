@@ -77,7 +77,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 		codeownersFilepaths.forEach((filepathPattern) => {
 			// Universal filepath means that all
 			// files in the commit are owned
-			if (filepathPattern == '/*') {
+			if (filepathPattern == '*') {
 				return [];
 			}
 
