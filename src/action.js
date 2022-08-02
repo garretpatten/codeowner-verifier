@@ -81,10 +81,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 				return [];
 			}
 
-			if (minimatch(filepath, filepathPattern)
-				|| filepathPattern.indexOf('*') != -1
-				&& filepath.substring(0, filepathPattern.indexOf('*'))
-				== filepathPattern.substring(0, filepathPattern.indexOf('*'))) {
+			if (isMatch(filepath, filepathPattern)) {
 				changedFilesWithoutOwnership.splice(
 					changedFilesWithoutOwnership.indexOf(
 						filepath
@@ -118,6 +115,17 @@ async function getTeams(token) {
 	for (let team of response.data) {
 		validTeams.push(team.name);
 	}
+}
+
+function isMatch(filepath, filepathPattern) {
+	if (minimatch(filepath, filepathPattern)) {
+		return true;
+	} else if (filepathPattern.indexOf('/*') !== -1) {
+		return filepath.substring(0, filepathPattern.indexOf('*'))
+			== filepathPattern.substring(0, filepathPattern.indexOf('*'));
+	}
+
+	return false;
 }
 
 /*
