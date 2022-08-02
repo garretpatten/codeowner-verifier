@@ -3,6 +3,7 @@
 
 # This should lead to an error
 /dist/ @aldjkdjflsd-jsdjflsdkf @JakeSpillane
+src/* @garretpatten
 
 # This should be validated
 **/action.js @garretpatten
