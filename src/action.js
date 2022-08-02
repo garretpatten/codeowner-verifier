@@ -118,13 +118,9 @@ async function getTeams(token) {
 }
 
 function isMatch(filepath, filepathPattern) {
-	console.log('');
-	console.log('in isMatch with ' + filepath ' and ' + filepathPattern);
 	if (minimatch(filepath, filepathPattern)) {
-		console.log('minimatch found a match, returning true');
 		return true;
 	} else if (filepathPattern.indexOf('/*') !== -1) {
-		console.log('this filepathPattern is a directory');
 		return filepath.substring(0, filepathPattern.indexOf('*'))
 			== filepathPattern.substring(0, filepathPattern.indexOf('*'));
 	}
