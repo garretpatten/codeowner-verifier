@@ -141,8 +141,6 @@ function validateCodeowners() {
 		getTeams(apiToken);
 	}
 
-	console.log(validTeams);
-
 	console.log('');
 	console.log('Changed files in this commit:');
 	console.log(changedFiles);
