@@ -83,7 +83,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 			let index;
 			if (isMatch(filepath, filepathPattern)) {
 				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
-				console.log(changedFilesWithoutOwnership);
+				console.log('');
 				index = changedFilesWithoutOwnership.indexOf(filepath);
 				if (changedFilesWithoutOwnership[index] == filepath) {
 					changedFilesWithoutOwnership.splice(
@@ -92,10 +92,8 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 						),
 						1
 					);
-				} else {
-					console.log('there was an indexing issue');
 				}
-				console.log(changedFilesWithoutOwnership);
+				console.log('');
 			}
 		});
 	}
