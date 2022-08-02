@@ -1,4 +1,4 @@
 # codeowners-validator
-A GitHub Action to check changed files and ensure that codeowners and the individuals and Teams it points to are valid
+A GitHub Action to validate the ownership and Teams within a CODEOWNERS file
 
 [ THIS CODE IS UNDER ACTIVE DEVELOPMENT ]
