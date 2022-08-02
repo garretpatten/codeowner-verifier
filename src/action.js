@@ -125,8 +125,11 @@ function isMatch(filepath, filepathPattern) {
 		return true;
 	} else if (filepathPattern.indexOf('/*') !== -1) {
 		console.log('this filepathPattern is a directory');
-		return filepath.substring(0, filepathPattern.indexOf('*'))
-			== filepathPattern.substring(0, filepathPattern.indexOf('*'));
+		if (filepath.substring(0, filepathPattern.indexOf('*'))
+			== filepathPattern.substring(0, filepathPattern.indexOf('*'))) {
+				console.log('a match has been found');
+				return true;
+			}
 	}
 
 	return false;
