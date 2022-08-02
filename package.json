@@ -5,7 +5,7 @@
   "main": "src/action.js",
   "scripts": {
     "build": "ncc build src/action.js --minify",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/action.test.js"
   },
   "repository": {
     "type": "git",
