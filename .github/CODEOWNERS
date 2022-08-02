@@ -6,13 +6,13 @@
 # * @God
 
 # Owner of all js files
-*.js @jsOwner
+*.yml @ymlOwner
 
 # Owner of all files in a directory
 /node_modules/ @nodeOwner
 
-# Owner of all files in a hidden directory
-/.github/ @githubOwner
+# Owner of all files in the first level of a hidden directory
+.github/* @githubOwner
 
 # Owner of all files in the first level of a directory
 src/* @srcOwnerFirstLevel

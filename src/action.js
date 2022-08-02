@@ -48,16 +48,11 @@ function buildCodeownersMap(codeownersLines) {
  * be unaltered.
  */
 function cleanPath(filepath) {
-	if (filepath == '/*') {
+	if (filepath == '*') {
 		return filepath
-	} else {
-		if (filepath.substring(0, 1) == '/') {
-			filepath = filepath.substring(1);
-		}
-
-		if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
-			filepath += '*';
-		}
+	} else if (filepath.substring(0, 1) == '/') {
+		filepath = filepath.substring(1);
+	}
 
 		return filepath;
 	}
@@ -109,9 +104,12 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
  * an entry in the CODEOWNERS file.
  */
 function getCodeowners(codeownerEntry) {
-	codeownerEntry.splice(0, 1);
-
-	return [...codeownerEntry];
+	if (codeownerEntry.length > 1) {
+		codeownerEntry.splice(0, 1);
+		return [...codeownerEntry];
+	} else {
+		return [];
+	}
 }
 
 async function getTeams(token) {
@@ -127,11 +125,25 @@ async function getTeams(token) {
 }
 
 function isMatch(filepath, filepathPattern) {
+	// Direct Matches
 	if (minimatch(filepath, filepathPattern)) {
 		return true;
+	// File extension matches - *.js
+	} else if (filepathPattern.substring(0,2) == '*.') {
+		if (filepathPattern.substring(1)
+			== filepath.substring(filepath.indexOf('.'))) {
+				return true;
+		} else {
+			return false;
+		}
+	// Full directory matches - directory/
+	} else if (filepathPattern.substring(filepathPattern.length - 1) == '/') {
+			return filepath.includes(filepathPattern.substring(1));
+	// First level directory matches - directory/*
 	} else if (filepathPattern.indexOf('/*') !== -1) {
-		return filepath.substring(0, filepathPattern.indexOf('*'))
-			== filepathPattern.substring(0, filepathPattern.indexOf('*'));
+		let filepathSplit = filepath.split('/');
+		let fileDirectory = filepathSplit[filepathSplit.length - 2];
+		return filepathPattern.includes(fileDirectory);
 	}
 
 	return false;
