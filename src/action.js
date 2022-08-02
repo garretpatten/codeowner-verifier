@@ -26,11 +26,16 @@ function buildCodeownersMap(codeownersLines) {
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1) {
 				codeownerEntry = codeownerLine.split(' ');
-				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
-				codeownersMap.set(
-					codeownerEntry[0],
-					getCodeowners(codeownerEntry)
-				);
+				// Codeowner entries with only a file path
+				// are valid but considered unowned, thus
+				// they should not be added to the map
+				if (codeownerEntry.length > 1) {
+					codeownerEntry[0] = cleanPath(codeownerEntry[0]);
+					codeownersMap.set(
+						codeownerEntry[0],
+						getCodeowners(codeownerEntry)
+					);
+				}
 		}
 	}
 
@@ -54,8 +59,7 @@ function cleanPath(filepath) {
 		filepath = filepath.substring(1);
 	}
 
-		return filepath;
-	}
+	return filepath;
 }
 
 /*
@@ -104,12 +108,9 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
  * an entry in the CODEOWNERS file.
  */
 function getCodeowners(codeownerEntry) {
-	if (codeownerEntry.length > 1) {
-		codeownerEntry.splice(0, 1);
-		return [...codeownerEntry];
-	} else {
-		return [];
-	}
+	codeownerEntry.splice(0, 1);
+
+	return [...codeownerEntry];
 }
 
 async function getTeams(token) {
