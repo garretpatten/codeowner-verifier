@@ -53,19 +53,16 @@ function buildCodeownersMap(codeownersLines) {
  * be unaltered.
  */
 function cleanPath(filepath) {
-	if (filepath == '/*') {
+	if (filepath == '*'
+		|| filepath == '/'
+		|| filepath == '/*'
+	) {
 		return filepath
-	} else {
-		if (filepath.substring(0, 1) == '/') {
-			filepath = filepath.substring(1);
-		}
-
-		if (filepath.substring(filepath.length - 1, filepath.length) == '/') {
-			filepath += '*';
-		}
-
-		return filepath;
+	} else if (filepath.substring(0, 1) == '/') {
+		filepath = filepath.substring(1);
 	}
+
+	return filepath;
 }
 
 /*
@@ -74,31 +71,38 @@ function cleanPath(filepath) {
  * that do not have a corresponding entry
  * in the CODEOWNERS file.
  */
-function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
-	const codeownersFilepaths = [...codeownersMap.keys()];
-	const changedFilesWithoutOwnership = [...changedFiles];
+ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
+ 	const codeownersFilepaths = [...codeownersMap.keys()];
+ 	const changedFilesWithoutOwnership = [...changedFiles];
 
-	for (let filepath of changedFiles) {
-		codeownersFilepaths.forEach((filepathPattern) => {
-			// Universal filepath means that all
-			// files in the commit are owned
-			if (filepathPattern == '/*') {
-				return [];
-			}
+ 	for (let filepath of changedFiles) {
+ 		codeownersFilepaths.forEach((filepathPattern) => {
+ 			// Universal filepath means that all
+ 			// files in the commit are owned
+ 			if (filepathPattern == '*') {
+ 				return [];
+ 			}
 
-			if (isMatch(filepath, filepathPattern)) {
-				changedFilesWithoutOwnership.splice(
-					changedFilesWithoutOwnership.indexOf(
-						filepath
-					),
-					1
-				);
-			}
-		});
-	}
+ 			let index;
+ 			if (isMatch(filepath, filepathPattern)) {
+ 				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
+ 				console.log('');
+ 				index = changedFilesWithoutOwnership.indexOf(filepath);
+ 				if (changedFilesWithoutOwnership[index] == filepath) {
+ 					changedFilesWithoutOwnership.splice(
+ 						changedFilesWithoutOwnership.indexOf(
+ 							filepath
+ 						),
+ 						1
+ 					);
+ 				}
+ 				console.log('');
+ 			}
+ 		});
+ 	}
 
-	return changedFilesWithoutOwnership;
-}
+ 	return changedFilesWithoutOwnership;
+ }
 
 /*
  * Returns a list of codeowners given
@@ -123,14 +127,33 @@ async function getTeams(token) {
 }
 
 function isMatch(filepath, filepathPattern) {
+	// Direct Matches
 	if (minimatch(filepath, filepathPattern)) {
 		return true;
+	// File extension matches - *.js
+	} else if (filepathPattern.substring(0,2) == '*.') {
+		if (filepath.includes(filepathPattern.substring(1))) {
+				return true;
+		} else {
+			return false;
+		}
+	// Full directory matches - directory/
+	} else if (filepathPattern.substring(filepathPattern.length - 1) == '/') {
+			return filepath.includes(filepathPattern.substring(1));
+	// First level directory matches - directory/*
 	} else if (filepathPattern.indexOf('/*') !== -1) {
-		return filepath.substring(0, filepathPattern.indexOf('*'))
-			== filepathPattern.substring(0, filepathPattern.indexOf('*'));
+		// First level root directory matches - /*
+		if (filepathPattern == '/*') {
+			if (!filepath.includes('/')) {
+				return true;
+			}
+		}
+		let filepathSplit = filepath.split('/');
+		let fileDirectory = filepathSplit[filepathSplit.length - 2];
+		return filepathPattern.includes(fileDirectory);
+	} else {
+		return false;
 	}
-
-	return false;
 }
 
 function validateCodeowners() {
@@ -162,25 +185,42 @@ function validateCodeowners() {
 	const apiToken = null;
 
 	const codeownersLines = [
-		'# This should be validated',
-		'/.github/* @garretpatten',
+		'# Universal Owner of all files',
+		'# * @god',
 		'',
-		'# This should lead to an error',
-		'/dist/ @invalidOwner',
+		'# Owner of all files in the first level of the root directory',
+		'/* @ownerOfFirstLevelOfRootDirectory',
 		'',
-		'# This should be validated',
-		'**/action.js @garretpatten',
+		'# Owner of all .yml files',
+		'*.yml @ymlOwner',
 		'',
-		'# This should be validated',
-		'/src/nSECURE/juice-shop/* @garretpatten'
+		'# Owner of all files in a directory',
+		'/node_modules/ @nodeModulesOwner',
+		'',
+		'# Owner of a specific directory path',
+		'/src/nSECURE/juice-shop/ @juiceShopOwner',
+		'',
+		'# Owner of all files in the first level of a hidden directory',
+		'.github/* @githubOwner',
+		'',
+		'# Owner of all files in the first level of a directory',
+		'src/* @srcOwnerFirstLevel',
+		'',
+		'# Owner of a subdirectory anywhere',
+		'objects/ @objectsOwner',
+		'',
+		'# Valid syntax for unowned file',
+		'LICENSE'
 	];
 
 	const changedFiles = [
 		'src/action.js',
+		'src/objects/testObject.js',
 		'LICENSE',
 		'package.json',
 		'.github/workflows/ExampleWorkflow.yml',
-		'src/nSECURE/juice-shop/objects/Email__c.field-meta.xml'
+		'src/nSECURE/juice-shop/classes/JuiceShopController.cls',
+		'dist/index.js'
 	];
 
 	const validTeams = [ '@garretpatten' ];
