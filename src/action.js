@@ -80,9 +80,11 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 
 	for (let filepath of changedFiles) {
 		codeownersFilepaths.forEach((filepathPattern) => {
-			// Universal filepath means that all
-			// files in the commit are owned
-			if (filepathPattern == '*') {
+			// Universal filepath means that all files
+			// changed in the PR/Push are owned
+			if (filepathPattern == '*'
+				|| filepathPattern == '/'
+			) {
 				return [];
 			}
 
