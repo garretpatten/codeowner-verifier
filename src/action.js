@@ -30,17 +30,21 @@ function buildCodeownersMap(codeownersLines) {
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1) {
 				codeownerEntry = codeownerLine.split(' ');
-				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
-				codeownersMap.set(
-					codeownerEntry[0],
-					getCodeowners(codeownerEntry)
-				);
+				// Codeowner entries with only a file path
+				// are valid but considered unowned, thus
+				// they should not be added to the map
+				if (codeownerEntry.length > 1) {
+					codeownerEntry[0] = cleanPath(codeownerEntry[0]);
+					codeownersMap.set(
+						codeownerEntry[0],
+						getCodeowners(codeownerEntry)
+					);
+				}
 		}
 	}
 
 	return codeownersMap;
 }
-
 
 /*
  * Cleans CODEOWNERS filepaths to
