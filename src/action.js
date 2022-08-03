@@ -1,3 +1,6 @@
+// TODO: Finalize javadoc comments once
+// the functional behavior is ironed out
+
 /* GitHub Dependencies */
 const core = require('@actions/core');
 const github = require('@actions/github');
@@ -52,15 +55,18 @@ function buildCodeownersMap(codeownersLines) {
  * encompassing '/*' filepath will
  * be unaltered.
  */
-function cleanPath(filepath) {
-	if (filepath == '*') {
-		return filepath
-	} else if (filepath.substring(0, 1) == '/') {
-		filepath = filepath.substring(1);
-	}
+ function cleanPath(filepath) {
+ 	if (filepath == '*'
+ 		|| filepath == '/'
+ 		|| filepath == '/*'
+ 	) {
+ 		return filepath
+ 	} else if (filepath.substring(0, 1) == '/') {
+ 		filepath = filepath.substring(1);
+ 	}
 
-	return filepath;
-}
+ 	return filepath;
+ }
 
 /*
  * Generates a list of files that have
@@ -129,8 +135,7 @@ function isMatch(filepath, filepathPattern) {
 		return true;
 	// File extension matches - *.js
 	} else if (filepathPattern.substring(0,2) == '*.') {
-		if (filepathPattern.substring(1)
-			== filepath.substring(filepath.indexOf('.'))) {
+		if (filepath.includes(filepathPattern.substring(1))) {
 				return true;
 		} else {
 			return false;
@@ -140,6 +145,12 @@ function isMatch(filepath, filepathPattern) {
 			return filepath.includes(filepathPattern.substring(1));
 	// First level directory matches - directory/*
 	} else if (filepathPattern.indexOf('/*') !== -1) {
+		// First level root directory matches - /*
+		if (filepathPattern == '/*') {
+			if (!filepath.includes('/')) {
+				return true;
+			}
+		}
 		let filepathSplit = filepath.split('/');
 		let fileDirectory = filepathSplit[filepathSplit.length - 2];
 		return filepathPattern.includes(fileDirectory);
