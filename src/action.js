@@ -184,7 +184,7 @@ function isMatch(filepath, filepathPattern) {
 }
 
 function removeFromList(list, item) {
-	index = list.indexOf(item);
+	const index = list.indexOf(item);
 	if (list[index] == item) {
 		list.splice(
 			list.indexOf(
@@ -208,8 +208,10 @@ function validateCodeowners() {
 
 	const apiToken = core.getInput(INPUT_API_TOKEN);
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
+
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
+
 	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
 	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
 
