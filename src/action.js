@@ -131,31 +131,50 @@ async function getTeams(token) {
 	}
 }
 
-function isMatch(filepath, filepathPattern) {
-	// Direct Matches
-	if (minimatch(filepath, filepathPattern)) {
-		return true;
-	// File extension matches - *.js
-	} else if (filepathPattern.substring(0,2) == '*.') {
+function isFileExtensionMatch(filepath, filepathPattern) {
+	if (filepathPattern.substring(0,2) == '*.') {
 		if (filepath.includes(filepathPattern.substring(1))) {
 				return true;
-		} else {
-			return false;
 		}
-	// Full directory matches - directory/
-	} else if (filepathPattern.substring(filepathPattern.length - 1) == '/') {
-			return filepath.includes(filepathPattern.substring(1));
-	// First level directory matches - directory/*
-	} else if (filepathPattern.indexOf('/*') !== -1) {
-		// First level root directory matches - /*
+	}
+
+	return false;
+}
+
+function isFirstLevelDirectoryMatch(filepath, filepathPattern) {
+	if (filepathPattern.indexOf('/*') !== -1) {
 		if (filepathPattern == '/*') {
 			if (!filepath.includes('/')) {
 				return true;
 			}
+		} else {
+			let filepathSplit = filepath.split('/');
+			let fileDirectory = filepathSplit[filepathSplit.length - 2];
+
+			return filepathPattern.includes(fileDirectory);
 		}
-		let filepathSplit = filepath.split('/');
-		let fileDirectory = filepathSplit[filepathSplit.length - 2];
-		return filepathPattern.includes(fileDirectory);
+	}
+
+	return false;
+}
+
+function isFullDirectoryMatch(filepath, filepathPattern) {
+	if (filepathPattern.substring(filepathPattern.length - 1) == '/') {
+		return filepath.includes(filepathPattern.substring(1));
+	}
+
+	return false;
+}
+
+function isMatch(filepath, filepathPattern) {
+	if (minimatch(filepath, filepathPattern)) {
+		return true;
+	} else 	if (isFileExtensionMatch(filepath, filepathPattern)) {
+		return true;
+	} else 	if (isFullDirectoryMatch(filepath, filepathPattern)) {
+		return true;
+	} else 	if (isFirstLevelDirectoryMatch(filepath, filepathPattern)) {
+		return true;
 	} else {
 		return false;
 	}
