@@ -22,6 +22,3 @@ objects/ @objectsOwner
 
 # Valid syntax for unowned file
 LICENSE
-
-# Test
-/ @UniversalOwnerMaybe
