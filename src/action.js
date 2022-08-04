@@ -14,6 +14,7 @@ const minimatch = require('minimatch');
 const INPUT_API_TOKEN = 'apiToken';
 const INPUT_CODEOWNERS_PATH = 'codeownersPath';
 const INPUT_CHANGED_FILES = 'changedFiles';
+const INPUT_DIRECTORY_IGNORE_LIST = 'directoryIgnoreList'
 const OUTPUT_TIMESTAMP = 'timestamp';
 
 /*
@@ -74,11 +75,17 @@ function buildCodeownersMap(codeownersLines) {
  * that do not have a corresponding entry
  * in the CODEOWNERS file.
  */
-function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
+function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryIgnoreList) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
 	const changedFilesWithoutOwnership = [...changedFiles];
 
 	for (let filepath of changedFiles) {
+		directoryIgnoreList.forEach((directory) => {
+			if (filepath.includes(directory)) {
+				removeFromList(changedFilesWithoutOwnership, filepath);
+			}
+		});
+
 		codeownersFilepaths.forEach((filepathPattern) => {
 			// Universal filepath means that all files
 			// changed in the PR/Push are owned
@@ -92,16 +99,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap) {
 			if (isMatch(filepath, filepathPattern)) {
 				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
 				console.log('');
-				index = changedFilesWithoutOwnership.indexOf(filepath);
-				if (changedFilesWithoutOwnership[index] == filepath) {
-					changedFilesWithoutOwnership.splice(
-						changedFilesWithoutOwnership.indexOf(
-							filepath
-						),
-						1
-					);
-				}
-				console.log('');
+				removeFromList(changedFilesWithoutOwnership, filepath);
 			}
 		});
 	}
@@ -180,6 +178,18 @@ function isMatch(filepath, filepathPattern) {
 	}
 }
 
+function removeFromList(list, item) {
+	index = list.indexOf(item);
+	if (list[index] == item) {
+		list.splice(
+			list.indexOf(
+				item
+			),
+			1
+		);
+	}
+}
+
 /*
  * Orchestrates this GitHub Action which
  * ensures that the commit in context
@@ -195,6 +205,8 @@ function validateCodeowners() {
 	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
+	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
+	const directoryIgnoreList = changedFilesSpaceDelimitedList.split(' ');
 
 	if (apiToken != null) {
 		getTeams(apiToken);
@@ -213,7 +225,8 @@ function validateCodeowners() {
 
 	const changedFilesWithoutOwnership = getChangedFilesWithoutOwnership(
 		changedFiles,
-		codeownersMap
+		codeownersMap,
+		directoryIgnoreList
 	);
 
 	console.log('');
