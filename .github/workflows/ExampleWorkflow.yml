@@ -24,6 +24,7 @@ jobs:
         uses: garretpatten/codeowners-validator@main
         with:
           changedFiles: ${{ steps.diff.outputs.all }}
+          directoryIgnoreList: '.git/ .sfdx/ .idea/ .vscode/ src/dependencies/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
