@@ -76,7 +76,7 @@ function buildCodeownersMap(codeownersLines) {
  */
 function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryIgnoreList) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
-	const changedFilesWithoutOwnership = [...changedFiles];
+	let changedFilesWithoutOwnership = [...changedFiles];
 
 	for (let filepath of changedFiles) {
 		directoryIgnoreList.forEach((directory) => {
@@ -91,14 +91,15 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryI
 			if (filepathPattern == '*'
 				|| filepathPattern == '/'
 			) {
-				return [];
+				changedFilesWithoutOwnership = [];
 			}
 
-			let index;
-			if (isMatch(filepath, filepathPattern)) {
-				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
-				console.log('');
-				removeFromList(changedFilesWithoutOwnership, filepath);
+			if (changedFilesWithoutOwnership.length > 0) {
+				if (isMatch(filepath, filepathPattern)) {
+					console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
+					console.log('');
+					removeFromList(changedFilesWithoutOwnership, filepath);
+				}
 			}
 		});
 	}
