@@ -168,21 +168,6 @@ function isFullDirectoryMatch(filepath, filepathPattern) {
 }
 
 function isMatch(filepath, filepathPattern) {
-	/*
-	const matchingFunctions = [
-		minimatch,
-		isFileExtensionMatch,
-		isFullDirectoryMatch,
-		isFirstLevelDirectoryMatch
-	];
-
-	matchingFunctions.forEach((matchingFunction) => {
-		if (matchingFunction(filepath, filepathPattern)) {
-			return true;
-		}
-	});
-	*/
-
 	if (minimatch(filepath, filepathPattern)) {
 		return true;
 	} else 	if (isFileExtensionMatch(filepath, filepathPattern)) {
