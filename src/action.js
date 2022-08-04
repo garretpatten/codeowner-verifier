@@ -114,6 +114,12 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryI
 function getCodeowners(codeownerEntry) {
 	codeownerEntry.splice(0, 1);
 
+	codeownerEntry.forEach((entry) => {
+		if (entry.substring(0, 1) == '#') {
+			removeFromList(codeownerEntry, entry);
+		}
+	});
+
 	return [...codeownerEntry];
 }
 
@@ -239,7 +245,7 @@ function validateCodeowners() {
 		'/node_modules/ @nodeModulesOwner',
 		'',
 		'# Owner of a specific directory path',
-		'/src/nSECURE/juice-shop/ @juiceShopOwner',
+		'/src/nSECURE/juice-shop/ @juiceShopOwner # Test Inline Comment',
 		'',
 		'# Owner of all files in the first level of a hidden directory',
 		'.github/* @githubOwner',
