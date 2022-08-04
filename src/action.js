@@ -206,7 +206,7 @@ function validateCodeowners() {
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
-	const directoryIgnoreList = changedFilesSpaceDelimitedList.split(' ');
+	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
 
 	if (apiToken != null) {
 		getTeams(apiToken);
