@@ -1,11 +1,11 @@
 {
   "name": "codeowners-validator",
   "version": "1.0.0",
-  "description": "A GitHub Action to check changed files and ensure that codeowners and the individuals and Teams it points to are valid",
+  "description": "A GitHub Action to validate the ownership and Teams within a CODEOWNERS file",
   "main": "src/action.js",
   "scripts": {
     "build": "ncc build src/action.js --minify",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/action.test.js"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "@actions/github": "^5.0.3",
     "@vercel/ncc": "^0.34.0",
     "fs": "^0.0.1-security",
-    "glob": "^8.0.3",
-    "minimatch": "^5.1.0"
+    "minimatch": "^5.1.0",
+    "octokit": "^2.0.4"
   }
 }

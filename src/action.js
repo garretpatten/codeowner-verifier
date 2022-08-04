@@ -168,6 +168,7 @@ function isFullDirectoryMatch(filepath, filepathPattern) {
 }
 
 function isMatch(filepath, filepathPattern) {
+	/*
 	const matchingFunctions = [
 		minimatch,
 		isFileExtensionMatch,
@@ -180,8 +181,19 @@ function isMatch(filepath, filepathPattern) {
 			return true;
 		}
 	});
+	*/
 
-	return false;
+	if (minimatch(filepath, filepathPattern)) {
+		return true;
+	} else 	if (isFileExtensionMatch(filepath, filepathPattern)) {
+		return true;
+	} else 	if (isFullDirectoryMatch(filepath, filepathPattern)) {
+		return true;
+	} else 	if (isFirstLevelDirectoryMatch(filepath, filepathPattern)) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function validateCodeowners() {

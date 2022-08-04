@@ -5,13 +5,17 @@ author: 'Garret Patten'
 # TODO: Add branding
 
 inputs:
+  apiToken:
+    description: 'Secret GitHub token used to retrieve GitHub Teams through the API'
+    required: false
+    default: null
   codeownersPath:
     description: 'The Codeowners path'
     required: true
     default: '.github/CODEOWNERS'
   changedFiles:
     description: 'Updated files included in the PR or Push'
-    required: true;
+    required: true
     default: null
   GITHUB_TOKEN:
     description: 'GitHub Token'
@@ -21,7 +25,6 @@ outputs:
   timestamp:
     description: 'Codeowners Validator timestamp'
 
-# TODO: Update to run minified dist/index.js
 runs:
   using: 'node12'
-  main: 'src/action.js'
+  main: 'dist/index.js'
