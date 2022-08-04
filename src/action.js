@@ -114,11 +114,11 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryI
 function getCodeowners(codeownerEntry) {
 	codeownerEntry.splice(0, 1);
 
-	codeownerEntry.forEach((entry) => {
-		if (entry.substring(0, 1) == '#') {
-			removeFromList(codeownerEntry, entry);
+	for (let index = 0; index < codeownerEntry.length; index++) {
+		if (codeownerEntry[index].substring(0, 1) == '#') {
+			codeownerEntry.splice(index);
 		}
-	});
+	}
 
 	return [...codeownerEntry];
 }
@@ -185,7 +185,7 @@ function isMatch(filepath, filepathPattern) {
 }
 
 function removeFromList(list, item) {
-	index = list.indexOf(item);
+	let index = list.indexOf(item);
 	if (list[index] == item) {
 		list.splice(
 			list.indexOf(
