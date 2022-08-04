@@ -58,7 +58,6 @@ function buildCodeownersMap(codeownersLines) {
  */
  function cleanPath(filepath) {
  	if (filepath == '*'
- 		|| filepath == '/'
  		|| filepath == '/*'
  	) {
  		return filepath
@@ -113,6 +112,12 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryI
  */
 function getCodeowners(codeownerEntry) {
 	codeownerEntry.splice(0, 1);
+
+	codeownerEntry.forEach((entry) => {
+		if (entry.substring(0, 1) == '#') {
+			removeItem(codeownerEntry, entry);
+		}
+	});
 
 	return [...codeownerEntry];
 }
