@@ -58,7 +58,6 @@ function buildCodeownersMap(codeownersLines) {
  */
 function cleanPath(filepath) {
 	if (filepath == '*'
-		|| filepath == '/'
 		|| filepath == '/*'
 	) {
 		return filepath
