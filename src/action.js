@@ -261,7 +261,8 @@ function validateCodeowners() {
 		'package.json',
 		'.github/workflows/ExampleWorkflow.yml',
 		'src/nSECURE/juice-shop/classes/JuiceShopController.cls',
-		'dist/index.js'
+		'dist/index.js',
+		'src/dependencies/ignoreThisDependency'
 	];
 
 	const directoryIgnoreSpaceDelimitedList = '.git/ .sfdx/ .idea/ .vscode/ src/dependencies/';
