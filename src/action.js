@@ -12,7 +12,6 @@ const minimatch = require('minimatch');
 /*
 	I/O
 const INPUT_API_TOKEN = 'apiToken';
-const INPUT_CODEOWNERS_PATH = 'codeownersPath';
 const INPUT_CHANGED_FILES = 'changedFiles';
 const INPUT_DIRECTORY_IGNORE_LIST = 'directoryIgnoreList'
 const OUTPUT_TIMESTAMP = 'timestamp';
@@ -23,7 +22,44 @@ const OUTPUT_TIMESTAMP = 'timestamp';
  * filepath to codeowners of that filepath
  * as indicated by the CODEOWNERS file
  */
-function buildCodeownersMap(codeownersLines) {
+function buildCodeownersMap() {
+	/*
+	const codeownersMetadata = fs.readFileSync(
+		'.github/CODEOWNERS',
+		'utf8'
+	);
+	const codeownersLines = codeownersMetadata.split('\n');
+	*/
+
+	const codeownersLines = [
+		'# Universal Owner of all files',
+		'# * @god',
+		'',
+		'# Owner of all files in the first level of the root directory',
+		'/* @ownerOfFirstLevelOfRootDirectory',
+		'',
+		'# Owner of all .yml files',
+		'*.yml @ymlOwner',
+		'',
+		'# Owner of all files in a directory',
+		'/node_modules/ @nodeModulesOwner',
+		'',
+		'# Owner of a specific directory path',
+		'/src/nSECURE/juice-shop/ @juiceShopOwner # Test Inline Comment',
+		'',
+		'# Owner of all files in the first level of a hidden directory',
+		'.github/* @githubOwner',
+		'',
+		'# Owner of all files in the first level of a directory',
+		'src/* @srcOwnerFirstLevel',
+		'',
+		'# Owner of a subdirectory anywhere',
+		'objects/ @objectsOwner',
+		'',
+		'# Valid syntax for unowned file',
+		'LICENSE'
+	];
+
 	let codeownerEntry;
 	const codeownersMap = new Map();
 
@@ -84,27 +120,23 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryI
 			}
 		});
 
-		codeownersFilepaths.forEach((filepathPattern) => {
-			// Universal filepath means that all files
-			// changed in the PR/Push are owned
+		for (let filepathPattern of codeownersFilepaths) {
 			if (filepathPattern == '*'
 				|| filepathPattern == '/'
 			) {
- 				changedFilesWithoutOwnership = [];
- 			}
-
-			if (changedFilesWithoutOwnership.length > 0) {
-				if (isMatch(filepath, filepathPattern)) {
-					console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
-					console.log('');
-					removeFromList(changedFilesWithoutOwnership, filepath);
-				}
+				return [];
 			}
-		});
+
+			if (isMatch(filepath, filepathPattern)) {
+				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
+				console.log('');
+				removeFromList(changedFilesWithoutOwnership, filepath);
+			}
+		}
 	}
 
- 	return changedFilesWithoutOwnership;
- }
+	return changedFilesWithoutOwnership;
+}
 
 /*
  * Returns a list of codeowners given
@@ -136,9 +168,7 @@ async function getTeams(token) {
 
 function isFileExtensionMatch(filepath, filepathPattern) {
 	if (filepathPattern.substring(0,2) == '*.') {
-		if (filepath.includes(filepathPattern.substring(1))) {
-				return true;
-		}
+		return filepath.includes(filepathPattern.substring(1));
 	}
 
 	return false;
@@ -147,9 +177,7 @@ function isFileExtensionMatch(filepath, filepathPattern) {
 function isFirstLevelDirectoryMatch(filepath, filepathPattern) {
 	if (filepathPattern.indexOf('/*') !== -1) {
 		if (filepathPattern == '/*') {
-			if (!filepath.includes('/')) {
-				return true;
-			}
+			return !filepath.includes('/');
 		} else {
 			let filepathSplit = filepath.split('/');
 			let fileDirectory = filepathSplit[filepathSplit.length - 2];
@@ -170,17 +198,20 @@ function isFullDirectoryMatch(filepath, filepathPattern) {
 }
 
 function isMatch(filepath, filepathPattern) {
-	if (minimatch(filepath, filepathPattern)) {
-		return true;
-	} else 	if (isFileExtensionMatch(filepath, filepathPattern)) {
-		return true;
-	} else 	if (isFullDirectoryMatch(filepath, filepathPattern)) {
-		return true;
-	} else 	if (isFirstLevelDirectoryMatch(filepath, filepathPattern)) {
-		return true;
-	} else {
-		return false;
+	const matchingFunctions = [
+		minimatch,
+		isFileExtensionMatch,
+		isFullDirectoryMatch,
+		isFirstLevelDirectoryMatch
+	];
+
+	for (let matchingFunction of matchingFunctions) {
+		if (matchingFunction(filepath, filepathPattern)) {
+			return true;
+		}
 	}
+
+	return false;
 }
 
 function removeFromList(list, item) {
@@ -208,7 +239,6 @@ function validateCodeowners() {
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
 	const apiToken = core.getInput(INPUT_API_TOKEN);
-	const codeownersPath = core.getInput(INPUT_CODEOWNERS_PATH);
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
@@ -230,35 +260,6 @@ function validateCodeowners() {
 
 	const apiToken = null;
 
-	const codeownersLines = [
-		'# Universal Owner of all files',
-		'# * @god',
-		'',
-		'# Owner of all files in the first level of the root directory',
-		'/* @ownerOfFirstLevelOfRootDirectory',
-		'',
-		'# Owner of all .yml files',
-		'*.yml @ymlOwner',
-		'',
-		'# Owner of all files in a directory',
-		'/node_modules/ @nodeModulesOwner',
-		'',
-		'# Owner of a specific directory path',
-		'/src/nSECURE/juice-shop/ @juiceShopOwner # Test Inline Comment',
-		'',
-		'# Owner of all files in the first level of a hidden directory',
-		'.github/* @githubOwner',
-		'',
-		'# Owner of all files in the first level of a directory',
-		'src/* @srcOwnerFirstLevel',
-		'',
-		'# Owner of a subdirectory anywhere',
-		'objects/ @objectsOwner',
-		'',
-		'# Valid syntax for unowned file',
-		'LICENSE'
-	];
-
 	const changedFiles = [
 		'src/action.js',
 		'src/objects/testObject.js',
@@ -275,7 +276,7 @@ function validateCodeowners() {
 
 	const validTeams = [ '@garretpatten' ];
 
-	const codeownersMap = buildCodeownersMap(codeownersLines);
+	const codeownersMap = buildCodeownersMap();
 
 	console.log('codeownersMap');
 	console.log(codeownersMap);
