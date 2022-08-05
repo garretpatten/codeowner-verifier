@@ -19,8 +19,9 @@ const OUTPUT_TIMESTAMP = 'timestamp';
 
 /*
  * Builds a Map<String, String[]> of
- * filepath to codeowners of that filepath
- * as indicated by the CODEOWNERS file
+ * filepathPattern to codeowners of
+ * that filepathPattern as indicated
+ * by the CODEOWNERS file.
  */
 function buildCodeownersMap() {
 	/*
@@ -84,14 +85,13 @@ function buildCodeownersMap() {
 }
 
 /*
- * Cleans CODEOWNERS filepaths to
- * facilitate filepattern/filepath
- * matching. Filepaths that start
- * with '/' will have them removed,
- * and directory paths that end in '/'
- * will have a '*' added. The all
- * encompassing '/*' filepath will
- * be unaltered.
+ * Cleans CODEOWNERS filepaths patterns
+ * to facilitate filepath pattern to
+ * filepath direct matching. Filepaths
+ * that start with '/' will the beginning
+ * forward slash removed unless that filepath
+ * pattern is the first level root directory
+ * pattern - '/*'.
  */
 function cleanPath(filepath) {
 	if (filepath != '/*'
@@ -105,11 +105,14 @@ function cleanPath(filepath) {
 
 /*
  * Generates a list of files that have
- * been changed in the commit in context
- * that do not have a corresponding entry
- * in the CODEOWNERS file.
+ * been changed that do not have explicit
+ * ownership defined in the CODEOWNERS file.
  */
-function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryIgnoreList) {
+function getChangedFilesWithoutOwnership(
+	changedFiles,
+	codeownersMap,
+	directoryIgnoreList
+) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
 	let changedFilesWithoutOwnership = [...changedFiles];
 
@@ -139,8 +142,11 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryI
 }
 
 /*
- * Returns a list of codeowners given
- * an entry in the CODEOWNERS file.
+ * Returns an array of codeowners given
+ * an entry in the CODEOWNERS file. This
+ * is done by removing the filepath pattern
+ * and isolating the owners by removing any
+ * inline comments beginning with a '#'.
  */
 function getCodeowners(codeownerEntry) {
 	codeownerEntry.splice(0, 1);
@@ -166,6 +172,15 @@ async function getTeams(token) {
 	}
 }
 
+/*
+ * Determines whether the filepath of a
+ * given changed file matches with a
+ * filepath pattern from the CODEOWNERS file.
+ *
+ * For case:
+ *   filepath: script.js
+ *   filepathPattern: *.js
+ */
 function isFileExtensionMatch(filepath, filepathPattern) {
 	if (filepathPattern.substring(0,2) == '*.') {
 		return filepath.includes(filepathPattern.substring(1));
@@ -174,6 +189,15 @@ function isFileExtensionMatch(filepath, filepathPattern) {
 	return false;
 }
 
+/*
+ * Determines whether the filepath of a
+ * given changed file matches with a
+ * filepath pattern from the CODEOWNERS file.
+ *
+ * For case:
+ *   filepath: README.md
+ *   filepathPattern: /*
+ */
 function isFirstLevelDirectoryMatch(filepath, filepathPattern) {
 	if (filepathPattern.indexOf('/*') !== -1) {
 		if (filepathPattern == '/*') {
@@ -189,6 +213,15 @@ function isFirstLevelDirectoryMatch(filepath, filepathPattern) {
 	return false;
 }
 
+/*
+ * Determines whether the filepath of a
+ * given changed file matches with a
+ * filepath pattern from the CODEOWNERS file.
+ *
+ * For case:
+ *   filepath: directory/subDirectory/script.js
+ *   filepathPattern: directory/
+ */
 function isFullDirectoryMatch(filepath, filepathPattern) {
 	if (filepathPattern.substring(filepathPattern.length - 1) == '/') {
 		return filepath.includes(filepathPattern.substring(1));
@@ -197,6 +230,17 @@ function isFullDirectoryMatch(filepath, filepathPattern) {
 	return false;
 }
 
+/*
+ * Orchestrating function to determine
+ * whether the filepath of a given changed
+ * file matches with a filepath pattern from
+ * the CODEOWNERS file.
+ *
+ * Runs an array of functions that handle
+ * different types of matches. When a match
+ * is found, true is returned. Otherwise,
+ * false is returned.
+ */
 function isMatch(filepath, filepathPattern) {
 	const matchingFunctions = [
 		minimatch,
@@ -214,6 +258,13 @@ function isMatch(filepath, filepathPattern) {
 	return false;
 }
 
+/*
+ * Helper function to remove a specific
+ * item from a given list using the
+ * index of the item. A check has been
+ * added to avoid errant removal of the
+ * incorrect item.
+ */
 function removeFromList(list, item) {
 	let index = list.indexOf(item);
 	if (list[index] == item) {
@@ -227,9 +278,19 @@ function removeFromList(list, item) {
 }
 
 /*
- * Orchestrates this GitHub Action which
- * ensures that the commit in context
- * achieves a valid CODEOWNERS state.
+ * Orchestrating function of the
+ * codeowners-validator GitHub Action.
+ * If unowned files (as determined by
+ * the CODEOWNERS file) have been added
+ * or updated in the push or pull request
+ * in context, errors will be set on the
+ * check that identify the unowned files.
+ * If an API token is provided, each owner
+ * within the CODEOWNERS file will also be
+ * validated using the GitHub Teams API. If
+ * invalid teams are found in the CODEOWNERS
+ * file, errors will be set on the check that
+ * identify the invalid owners.
  */
 function validateCodeowners() {
 	/*
