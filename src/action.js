@@ -223,9 +223,6 @@ function validateCodeowners() {
 	console.log('Changed files in this commit:');
 	console.log(changedFiles);
 
-	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
-	const codeownersLines = codeownersMetadata.split('\n');
-
 	const codeownersMap = buildCodeownersMap();
 	console.log('');
 	console.log(codeownersMap);
