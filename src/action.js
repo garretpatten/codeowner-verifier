@@ -1,6 +1,3 @@
-// TODO: Finalize javadoc comments once
-// the functional behavior is ironed out
-
 /* GitHub Dependencies */
 const core = require('@actions/core');
 const github = require('@actions/github');
