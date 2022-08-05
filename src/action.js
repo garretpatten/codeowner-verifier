@@ -58,11 +58,9 @@ function buildCodeownersMap(codeownersLines) {
  * be unaltered.
  */
 function cleanPath(filepath) {
-	if (filepath == '*'
-		|| filepath == '/*'
+	if (filepath != '/*'
+		&& filepath.substring(0, 1) == '/'
 	) {
-		return filepath
-	} else if (filepath.substring(0, 1) == '/') {
 		filepath = filepath.substring(1);
 	}
 
@@ -234,7 +232,7 @@ function validateCodeowners() {
 
 	const codeownersLines = [
 		'# Universal Owner of all files',
-		'* @god',
+		'# * @god',
 		'',
 		'# Owner of all files in the first level of the root directory',
 		'/* @ownerOfFirstLevelOfRootDirectory',
