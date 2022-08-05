@@ -56,17 +56,15 @@ function buildCodeownersMap(codeownersLines) {
  * encompassing '/*' filepath will
  * be unaltered.
  */
- function cleanPath(filepath) {
- 	if (filepath == '*'
- 		|| filepath == '/*'
- 	) {
- 		return filepath
- 	} else if (filepath.substring(0, 1) == '/') {
- 		filepath = filepath.substring(1);
- 	}
+function cleanPath(filepath) {
+	if (filepath != '/*'
+		&& filepath.substring(0, 1) == '/'
+	) {
+		filepath = filepath.substring(1);
+	}
 
- 	return filepath;
- }
+	return filepath;
+}
 
 /*
  * Generates a list of files that have
