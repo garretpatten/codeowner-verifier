@@ -417,7 +417,11 @@ function validateCodeowners() {
 		});
 	}
 
-	// core.setFailed(errorMessage);
+	/*
+	if (errorMessage != null) {
+		core.setFailed(errorMessage);
+	}
+	*/
 	console.log(errorMessage);
 
 	/*
