@@ -2,8 +2,8 @@
 	GitHub Dependencies
 const core = require('@actions/core');
 const github = require('@actions/github');
-const { Octokit } = require('@octokit/core');
 */
+const { Octokit } = require('@octokit/core');
 
 /* Node Dependencies */
 const fs = require('fs');
@@ -161,16 +161,34 @@ function getCodeowners(codeownerEntry) {
 	return [...codeownerEntry];
 }
 
-async function getTeams(token) {
-	const response = await new Octokit(
-		{ auth: token }
-	).request('GET /orgs/ncino/teams');
+function getTeams(token) {
+	let p = new Promise((resolve, reject) => {
+		let response;
+		(async () => {
+			console.log('in async function');
+			response = await new Octokit(
+				{ auth: token }
+			).request('GET /orgs/ncino/teams');
+			console.log('request complete');
+			console.log(response);
 
-	console.log(response);
+			if (response && response.data) {
+				const retrievedTeams = [];
+				for (let team of response.data) {
+					retrievedTeams.push(team.name);
+				}
 
-	for (let team of response.data) {
-		validTeams.push(team.name);
-	}
+				resolve(retrievedTeams);
+			} else {
+				console.log('There was an error retrieving teams');
+				console.log(response);
+
+				reject(response);
+			}
+		})();
+	});
+
+	return p;
 }
 
 /*
@@ -294,9 +312,9 @@ function removeFromList(list, item) {
  * identify the invalid owners.
  */
 function validateCodeowners() {
-	/*
-	const validTeams = null;
+	let validTeams = null;
 
+	/*
 	const repoName = github.context.payload.repository.full_name.split('/')[1];
 	console.log('Running codeowners-validator action for the ' + repoName + ' repository...');
 
@@ -305,11 +323,24 @@ function validateCodeowners() {
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
 	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
+	*/
 
+	const apiToken = 'testToken';
+
+	let apiPromise = null;
 	if (apiToken != null) {
-		getTeams(apiToken);
+		apiPromise = new Promise((resolve, reject) => {
+			getTeams(apiToken).then((teams) => {
+				validTeams = teams;
+				resolve(validTeams);
+			}).catch((error) => {
+				console.log(error);
+				reject(error);
+			});
+		});
 	}
 
+	/*
 	console.log(validTeams);
 
 	console.log('');
@@ -319,8 +350,6 @@ function validateCodeowners() {
 	const codeownersMetadata = fs.readFileSync(codeownersPath, 'utf8');
 	const codeownersLines = codeownersMetadata.split('\n');
 	*/
-
-	const apiToken = null;
 
 	const changedFiles = [
 		'src/action.js',
@@ -335,8 +364,6 @@ function validateCodeowners() {
 
 	const directoryIgnoreSpaceDelimitedList = '.git/ .sfdx/ .idea/ .vscode/ src/dependencies/';
 	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
-
-	const validTeams = [ '@garretpatten' ];
 
 	const codeownersMap = buildCodeownersMap();
 
@@ -354,7 +381,7 @@ function validateCodeowners() {
 	console.log('Changed files without ownership in this commit:');
 	console.log(changedFilesWithoutOwnership);
 
-	if (validTeams != null) {
+	apiPromise.then((response) => {
 		let invalidTeams = [];
 		let owners;
 
@@ -378,7 +405,7 @@ function validateCodeowners() {
 			// core.setFailed(errorMessage);
 			console.log(errorMessage);
 		}
-	}
+	}).catch((error) => {});
 
 	/*
 	core.setOutput(
