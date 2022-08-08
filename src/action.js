@@ -334,7 +334,7 @@ function validateCodeowners() {
 	let unownedFilesErrorMessage;
 	let invalidTeamsErrorMessage;
 	if (changedFilesWithoutOwnership.length > 0) {
-		unownedFilesErrorMessage = 'There are files without ownership in this PR: ';
+		unownedFilesErrorMessage = 'There are files without ownership in this work: ';
 
 		changedFilesWithoutOwnership.forEach((file) => {
 			unownedFilesErrorMessage += file + ' ';
