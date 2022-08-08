@@ -316,35 +316,40 @@ function validateCodeowners() {
 		directoryIgnoreList
 	);
 
-	console.log('');
-	console.log('Changed files without ownership in this commit:');
-	console.log(changedFilesWithoutOwnership);
+	let invalidTeams = [];
+	if (apiPromise != null) {
+		apiPromise.then((response) => {
+			let owners = codeownersMap.get(key);
 
-	apiPromise.then((response) => {
-		let invalidTeams = [];
-		let owners;
+			for (let key of codeownersMap.keys()) {
+				owners.forEach((owner) => {
+					if (!validTeams.includes(owner)) {
+						invalidTeams.push(owner);
+					}
+				});
+			}
+		}).catch((error) => {});
+	}
 
-		for (let key of codeownersMap.keys()) {
-			owners = codeownersMap.get(key);
-			owners.forEach((owner) => {
-				if (!validTeams.includes(owner)) {
-					invalidTeams.push(owner);
-				}
-			});
-		}
+	let unownedFilesErrorMessage;
+	let invalidTeamsErrorMessage;
+	if (changedFilesWithoutOwnership.length > 0) {
+		unownedFilesErrorMessage = 'There are files without ownership in this PR: ';
+
+		changedFilesWithoutOwnership.forEach((file) => {
+			unownedFilesErrorMessage += file + ' ';
+		});
 
 		if (invalidTeams.length > 0) {
-			let errorMessage = 'There are invalid Teams in the CODEOWNERS file: ';
-
+			invalidTeamsErrorMessage = 'There are invalid Teams in the CODEOWNERS file: ';
 			invalidTeams.forEach((team) => {
-				errorMessage += team + ' '
+				invalidTeamsErrorMessage += team + ' '
 			});
-
-
-			// core.setFailed(errorMessage);
-			console.log(errorMessage);
 		}
-	}).catch((error) => {});
+
+		const fullErrorMessage = unownedFilesErrorMessage + '\n' + invalidTeamsErrorMessage;
+		core.setFailed(fullErrorMessage);
+	}
 
 	core.setOutput(
 		OUTPUT_TIMESTAMP,
