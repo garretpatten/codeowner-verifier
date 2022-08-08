@@ -323,9 +323,10 @@ function validateCodeowners() {
 	let invalidTeams = [];
 	if (apiPromise != null) {
 		apiPromise.then((response) => {
-			let owners = codeownersMap.get(key);
+			let owners;
 
 			for (let key of codeownersMap.keys()) {
+				owners = codeownersMap.get(key);
 				owners.forEach((owner) => {
 					if (!validTeams.includes(owner)) {
 						invalidTeams.push(owner);
