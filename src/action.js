@@ -130,9 +130,13 @@ function getTeams(token) {
 		let response;
 		(async () => {
 			console.log('in async function');
-			response = await new Octokit(
-				{ auth: token }
-			).request('GET /orgs/ncino/teams');
+			try {
+				response = await new Octokit(
+					{ auth: token }
+				).request('GET /orgs/ncino/teams');
+			} catch (e) {
+				reject(e);
+			}
 			console.log('request complete');
 			console.log(response);
 
