@@ -125,16 +125,34 @@ function getCodeowners(codeownerEntry) {
 	return [...codeownerEntry];
 }
 
-async function getTeams(token) {
-	const response = await new Octokit(
-		{ auth: token }
-	).request('GET /orgs/ncino/teams');
+function getTeams(token) {
+	let p = new Promise((resolve, reject) => {
+		let response;
+		(async () => {
+			console.log('in async function');
+			response = await new Octokit(
+				{ auth: token }
+			).request('GET /orgs/ncino/teams');
+			console.log('request complete');
+			console.log(response);
 
-	console.log(response);
+			if (response && response.data) {
+				const retrievedTeams = [];
+				for (let team of response.data) {
+					retrievedTeams.push(team.name);
+				}
 
-	for (let team of response.data) {
-		validTeams.push(team.name);
-	}
+				resolve(retrievedTeams);
+			} else {
+				console.log('There was an error retrieving teams');
+				console.log(response);
+
+				reject(response);
+			}
+		})();
+	});
+
+	return p;
 }
 
 /*
@@ -271,8 +289,17 @@ function validateCodeowners() {
 	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
 	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
 
+	let apiPromise = null;
 	if (apiToken != null) {
-		getTeams(apiToken);
+		apiPromise = new Promise((resolve, reject) => {
+			getTeams(apiToken).then((teams) => {
+				validTeams = teams;
+				resolve(validTeams);
+			}).catch((error) => {
+				console.log(error);
+				reject(error);
+			});
+		});
 	}
 
 	console.log('');
@@ -293,7 +320,7 @@ function validateCodeowners() {
 	console.log('Changed files without ownership in this commit:');
 	console.log(changedFilesWithoutOwnership);
 
-	if (validTeams != null) {
+	apiPromise.then((response) => {
 		let invalidTeams = [];
 		let owners;
 
@@ -311,11 +338,13 @@ function validateCodeowners() {
 
 			invalidTeams.forEach((team) => {
 				errorMessage += team + ' '
-			})
+			});
 
-			core.setFailed(errorMessage);
+
+			// core.setFailed(errorMessage);
+			console.log(errorMessage);
 		}
-	}
+	}).catch((error) => {});
 
 	core.setOutput(
 		OUTPUT_TIMESTAMP,
