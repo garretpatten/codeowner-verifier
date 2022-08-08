@@ -166,9 +166,14 @@ function getTeams(token) {
 		let response;
 		(async () => {
 			console.log('in async function');
-			response = await new Octokit(
-				{ auth: token }
-			).request('GET /orgs/ncino/teams');
+			try {
+				response = await new Octokit(
+					{ auth: token }
+				).request('GET /orgs/ncino/teams');
+			} catch (e) {
+				reject(e);
+			}
+
 			console.log('request complete');
 			console.log(response);
 
@@ -325,7 +330,7 @@ function validateCodeowners() {
 	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
 	*/
 
-	const apiToken = 'testToken';
+	const apiToken = null;
 
 	let apiPromise = null;
 	if (apiToken != null) {
@@ -381,31 +386,39 @@ function validateCodeowners() {
 	console.log('Changed files without ownership in this commit:');
 	console.log(changedFilesWithoutOwnership);
 
-	apiPromise.then((response) => {
-		let invalidTeams = [];
-		let owners;
+	let invalidTeams = [];
+	if (apiPromise != null) {
+		apiPromise.then((response) => {
+			let owners = codeownersMap.get(key);
 
-		for (let key of codeownersMap.keys()) {
-			owners = codeownersMap.get(key);
-			owners.forEach((owner) => {
-				if (!validTeams.includes(owner)) {
-					invalidTeams.push(owner);
-				}
-			});
-		}
+			for (let key of codeownersMap.keys()) {
+				owners.forEach((owner) => {
+					if (!validTeams.includes(owner)) {
+						invalidTeams.push(owner);
+					}
+				});
+			}
+		}).catch((error) => {});
+	}
 
-		if (invalidTeams.length > 0) {
-			let errorMessage = 'There are invalid Teams in the CODEOWNERS file: ';
+	let errorMessage = null;
+	if (changedFilesWithoutOwnership.length > 0) {
+		errorMessage = '\n' + 'There are files without ownership in this work:' + '\n';
 
-			invalidTeams.forEach((team) => {
-				errorMessage += team + ' '
-			});
+		changedFilesWithoutOwnership.forEach((file) => {
+			errorMessage += file + '\n';
+		});
+	}
 
+	if (invalidTeams.length > 0) {
+		errorMessage = '\n' + 'There are invalid Teams in the CODEOWNERS file:' + '\n';
+		invalidTeams.forEach((team) => {
+			errorMessage += team + '\n'
+		});
+	}
 
-			// core.setFailed(errorMessage);
-			console.log(errorMessage);
-		}
-	}).catch((error) => {});
+	// core.setFailed(errorMessage);
+	console.log(errorMessage);
 
 	/*
 	core.setOutput(
