@@ -335,24 +335,24 @@ function validateCodeowners() {
 		}).catch((error) => {});
 	}
 
-	let unownedFilesErrorMessage;
-	let invalidTeamsErrorMessage;
+	let errorMessage = null;
 	if (changedFilesWithoutOwnership.length > 0) {
-		unownedFilesErrorMessage = 'There are files without ownership in this work: ';
+		errorMessage = '\n' + 'There are files without ownership in this work:' + '\n';
 
 		changedFilesWithoutOwnership.forEach((file) => {
-			unownedFilesErrorMessage += file + ' ';
+			errorMessage += file + '\n';
 		});
+	}
 
-		if (invalidTeams.length > 0) {
-			invalidTeamsErrorMessage = 'There are invalid Teams in the CODEOWNERS file: ';
-			invalidTeams.forEach((team) => {
-				invalidTeamsErrorMessage += team + ' '
-			});
-		}
+	if (invalidTeams.length > 0) {
+		errorMessage = '\n' + 'There are invalid Teams in the CODEOWNERS file:' + '\n';
+		invalidTeams.forEach((team) => {
+			errorMessage += team + '\n'
+		});
+	}
 
-		const fullErrorMessage = unownedFilesErrorMessage + '\n' + invalidTeamsErrorMessage;
-		core.setFailed(fullErrorMessage);
+	if (errorMessage != null) {
+		core.setFailed(errorMessage);
 	}
 
 	core.setOutput(
