@@ -50,7 +50,6 @@ function buildCodeownersMap() {
 	return codeownersMap;
 }
 
-
 /*
  * Cleans CODEOWNERS filepaths patterns
  * to facilitate filepath pattern to
@@ -125,11 +124,19 @@ function getCodeowners(codeownerEntry) {
 	return [...codeownerEntry];
 }
 
+/*
+ * Returns a promise that is either resolved or
+ * rejected based on the response from the GitHub
+ * Teams API. If the call is successful, the promise
+ * will be resolved with an array of valid Teams
+ * within the GitHub organization. If the call is
+ * unsuccessful, the promise will be rejected with
+ * the caught exception.
+ */
 function getTeams(token) {
 	let p = new Promise((resolve, reject) => {
-		let response;
 		(async () => {
-			console.log('in async function');
+			let response;
 			try {
 				response = await new Octokit(
 					{ auth: token }
@@ -137,8 +144,6 @@ function getTeams(token) {
 			} catch (e) {
 				reject(e);
 			}
-			console.log('request complete');
-			console.log(response);
 
 			if (response && response.data) {
 				const retrievedTeams = [];
@@ -148,9 +153,6 @@ function getTeams(token) {
 
 				resolve(retrievedTeams);
 			} else {
-				console.log('There was an error retrieving teams');
-				console.log(response);
-
 				reject(response);
 			}
 		})();
@@ -307,7 +309,7 @@ function validateCodeowners() {
 	}
 
 	console.log('');
-	console.log('Changed files in this commit:');
+	console.log('Changed files:');
 	console.log(changedFiles);
 
 	const codeownersMap = buildCodeownersMap();
