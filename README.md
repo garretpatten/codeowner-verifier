@@ -26,7 +26,7 @@ The `directoryIgnoreList` is an optional parameter that allows a repository to d
 The `GITHUB_TOKEN` is a required parameter that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context.
 
 ## Maintainers
-@garretpatten.
+[@GarretPatten](https://github.com/garretpatten).
 
 ## Contributing
 TODO: Add information around contributions.
