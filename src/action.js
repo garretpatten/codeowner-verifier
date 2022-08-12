@@ -141,7 +141,7 @@ function getTeams(token) {
 				response = await new Octokit(
 					{ auth: token }
 				).request('GET /orgs/ncino/teams');
-			} catch (e) {
+			} catch(e) {
 				reject(e);
 			}
 
