@@ -54,7 +54,7 @@ function buildCodeownersMap() {
  * Cleans CODEOWNERS filepaths patterns
  * to facilitate filepath pattern to
  * filepath direct matching. Filepaths
- * that start with '/' will the beginning
+ * that start with '/' will have the beginning
  * forward slash removed unless that filepath
  * pattern is the first level root directory
  * pattern - '/*'.
