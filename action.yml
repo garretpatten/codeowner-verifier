@@ -13,8 +13,8 @@ inputs:
     description: 'Updated files included in the PR or Push'
     required: true
     default: null
-  directoryIgnoreList:
-     description: 'Space delimited string list of directories to ignore when evaluating ownership'
+  ignoreList:
+     description: 'Space delimited string list of filepath patterns to ignore when evaluating ownership'
      required: false
      default: null
   GITHUB_TOKEN:

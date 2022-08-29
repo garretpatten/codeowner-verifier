@@ -10,7 +10,7 @@ const minimatch = require('minimatch');
 /* I/O */
 const INPUT_API_TOKEN = 'apiToken';
 const INPUT_CHANGED_FILES = 'changedFiles';
-const INPUT_DIRECTORY_IGNORE_LIST = 'directoryIgnoreList'
+const INPUT_IGNORE_LIST = 'ignoreList'
 const OUTPUT_TIMESTAMP = 'timestamp';
 
 /*
@@ -74,13 +74,13 @@ function cleanPath(filepath) {
  * been changed that do not have explicit
  * ownership defined in the CODEOWNERS file.
  */
-function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, directoryIgnoreList) {
+function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, ignoreList) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
 	let changedFilesWithoutOwnership = [...changedFiles];
 
 	for (let filepath of changedFiles) {
-		directoryIgnoreList.forEach((directory) => {
-			if (filepath.includes(directory)) {
+		ignoreList.forEach((path) => {
+			if (filepath.includes(path)) {
 				removeFromList(changedFilesWithoutOwnership, filepath);
 			}
 		});
@@ -292,8 +292,8 @@ function validateCodeowners() {
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
 
-	const directoryIgnoreSpaceDelimitedList = core.getInput(INPUT_DIRECTORY_IGNORE_LIST);
-	const directoryIgnoreList = directoryIgnoreSpaceDelimitedList.split(' ');
+	const ignoreSpaceDelimitedList = core.getInput(INPUT_IGNORE_LIST);
+	const ignoreList = ignoreSpaceDelimitedList.split(' ');
 
 	let apiPromise = null;
 	if (apiToken != null) {
@@ -308,18 +308,12 @@ function validateCodeowners() {
 		});
 	}
 
-	console.log('');
-	console.log('Changed files:');
-	console.log(changedFiles);
-
 	const codeownersMap = buildCodeownersMap();
-	console.log('');
-	console.log(codeownersMap);
 
 	const changedFilesWithoutOwnership = getChangedFilesWithoutOwnership(
 		changedFiles,
 		codeownersMap,
-		directoryIgnoreList
+		ignoreList
 	);
 
 	let invalidTeams = [];
