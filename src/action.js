@@ -345,10 +345,18 @@ function validateCodeowners() {
 		changedFilesWithoutOwnership.forEach((file) => {
 			errorMessage += file + '\n';
 		});
+
+		errorMessage += '\n' + 'Please update the CODEOWNERS file to take ownership over the updated files '
+			+ 'following the CODEOWNERS example file from GitHub Docs found here:' + '\n'
+			+ 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file' + '\n'
+			+ 'If files should be ignored or have no ownership, they can be added to the .github/workflows/codeowners-validator.yml file. '
+			+ 'For reference, see the `ignoreList` parameter in the codeowners-validator README found here:' + '\n'
+			+ 'https://github.com/garretpatten/codeowners-validator#ignorelist'
 	}
 
 	if (invalidTeams.length > 0) {
 		errorMessage = '\n' + 'There are invalid Teams in the CODEOWNERS file:' + '\n';
+
 		invalidTeams.forEach((team) => {
 			errorMessage += team + '\n'
 		});
