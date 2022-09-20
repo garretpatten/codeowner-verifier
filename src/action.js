@@ -39,7 +39,9 @@ function buildCodeownersMap() {
 			// If there is not an owner after the first space
 			// in the codeownerLine, then the filepath has a
 			// space and must be handled differently
-			if (codeownerLine[codeownerLine.indexOf(' ') + 1] != '@') {
+			if (codeownerLine.indexOf('@') !== -1
+				&& codeownerLine[codeownerLine.indexOf(' ') + 1] != '@'
+			) {
 				codeownerEntry = handleFilepathWithSpace(codeownerLine);
 			} else {
 				codeownerEntry = codeownerLine.split(' ');
