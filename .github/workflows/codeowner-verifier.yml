@@ -22,7 +22,7 @@ jobs:
 
       - name: Codeowner Verifier
         id: codeownerVerifier
-        uses: garretpatten/codeowner-verifier@v1.0
+        uses: garretpatten/codeowner-verifier@v1.1
         with:
           changedFiles: ${{ steps.diff.outputs.all }}
           directoryIgnoreList: '.git/ .sfdx/ .idea/ .vscode/ src/dependencies/'
