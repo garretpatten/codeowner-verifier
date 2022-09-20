@@ -20,6 +20,9 @@ const OUTPUT_TIMESTAMP = 'timestamp';
  * by the CODEOWNERS file.
  */
 function buildCodeownersMap() {
+	// TODO: Catch error if CODEOWNERS fails to be
+	// be read and exit process early with user
+	// friendly error message
 	const codeownersMetadata = fs.readFileSync(
 		'.github/CODEOWNERS',
 		'utf8'
@@ -33,7 +36,15 @@ function buildCodeownersMap() {
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1
 		) {
-			codeownerEntry = codeownerLine.split(' ');
+			// If there is not an owner after the first space
+			// in the codeownerLine, then the filepath has a
+			// space and must be handled differently
+			if (codeownerLine[codeownerLine.indexOf(' ') + 1] != '@') {
+				codeownerEntry = handleFilepathWithSpace(codeownerLine);
+			} else {
+				codeownerEntry = codeownerLine.split(' ');
+			}
+
 			// Codeowner entries with only a file path
 			// are valid but considered unowned, thus
 			// they should not be added to the map
@@ -159,6 +170,34 @@ function getTeams(token) {
 	});
 
 	return p;
+}
+
+/*
+ * Generates a codeowner entry array
+ * given a codeowner line where the
+ * filepath contains spaces and thus
+ * must be processed accordingly
+ */
+function handleFilepathWithSpace(codeownerLine) {
+	let codeownerEntry = [];
+	let filepath = '';
+	let indexOfSpace;
+
+	let finished = false;
+	while (!finished) {
+		indexOfSpace = codeownerLine.indexOf(' ');
+		filepath += codeownerLine.substring(0, indexOfSpace + 1);
+		codeownerLine = codeownerLine.substring(indexOfSpace + 1);
+		if (codeownerLine[0] == '@') {
+			// Remove delimiting space from filepath
+			filepath = filepath.substring(0, filepath.length - 1);
+			codeownerEntry.push(filepath, ...codeownerLine.split(' '));
+
+			finished = true;
+		}
+	}
+
+	return codeownerEntry;
 }
 
 /*
