@@ -58,7 +58,10 @@ function buildCodeownersMap() {
 		'objects/ @objectsOwner',
 		'',
 		'# Valid syntax for unowned file',
-		'LICENSE'
+		'LICENSE',
+		'',
+		'# Test support for spaces',
+		'src/this is a test/another test.txt @spaceMan'
 	];
 
 	let codeownerEntry;
@@ -68,7 +71,16 @@ function buildCodeownersMap() {
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1
 		) {
-			codeownerEntry = codeownerLine.split(' ');
+			// If there is not an owner after the first space
+			// in the codeownerLine, then the filepath has a
+			// space and must be handled differently
+			if (codeownerLine.indexOf('@') !== -1
+				&& codeownerLine[codeownerLine.indexOf(' ') + 1] != '@') {
+				codeownerEntry = handleFilepathWithSpace(codeownerLine);
+			} else {
+				codeownerEntry = codeownerLine.split(' ');
+			}
+
 			// Codeowner entries with only a file path
 			// are valid but considered unowned, thus
 			// they should not be added to the map
@@ -197,6 +209,36 @@ function getTeams(token) {
 }
 
 /*
+ * Generates a codeowner entry array
+ * given a codeowner line where the
+ * filepath contains spaces and thus
+ * must be processed accordingly
+ */
+function handleFilepathWithSpace(codeownerLine) {
+	let codeownerEntry = [];
+	let filepath = '';
+	let indexOfSpace;
+
+	let finished = false;
+	console.log('entering while loop with');
+	console.log(codeownerLine);
+	while (!finished) {
+		indexOfSpace = codeownerLine.indexOf(' ');
+		filepath += codeownerLine.substring(0, indexOfSpace + 1);
+		codeownerLine = codeownerLine.substring(indexOfSpace + 1);
+		if (codeownerLine[0] == '@') {
+			// Remove delimiting space from filepath
+			filepath = filepath.substring(0, filepath.length - 1);
+			codeownerEntry.push(filepath, ...codeownerLine.split(' '));
+
+			finished = true;
+		}
+	}
+
+	return codeownerEntry;
+}
+
+/*
  * Determines whether the filepath of a
  * given changed file matches with a
  * filepath pattern from the CODEOWNERS file.
@@ -317,6 +359,7 @@ function removeFromList(list, item) {
  * identify the invalid owners.
  */
 function validateCodeowners() {
+	console.log('I am alive');
 	let validTeams = null;
 
 	/*
@@ -364,7 +407,8 @@ function validateCodeowners() {
 		'.github/workflows/ExampleWorkflow.yml',
 		'src/nSECURE/juice-shop/classes/JuiceShopController.cls',
 		'dist/index.js',
-		'src/dependencies/ignoreThisDependency'
+		'src/dependencies/ignoreThisDependency',
+		'src/this is a test/another test.txt'
 	];
 
 	const directoryIgnoreSpaceDelimitedList = '.git/ .sfdx/ .idea/ .vscode/ src/dependencies/';
