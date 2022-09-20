@@ -20,9 +20,6 @@ const OUTPUT_TIMESTAMP = 'timestamp';
  * by the CODEOWNERS file.
  */
 function buildCodeownersMap() {
-	// TODO: Catch error if CODEOWNERS fails to be
-	// be read and exit process early with user
-	// friendly error message
 	const codeownersMetadata = fs.readFileSync(
 		'.github/CODEOWNERS',
 		'utf8'
@@ -31,17 +28,15 @@ function buildCodeownersMap() {
 
 	let codeownerEntry;
 	const codeownersMap = new Map();
-
 	for (let codeownerLine of codeownersLines) {
 		if (codeownerLine.substring(0,1) != '#'
 			&& codeownerLine.length > 1
 		) {
-			// If there is not an owner after the first space
-			// in the codeownerLine, then the filepath has a
-			// space and must be handled differently
-			if (codeownerLine.indexOf('@') !== -1
-				&& codeownerLine[codeownerLine.indexOf(' ') + 1] != '@'
-			) {
+			// If there are escaped spaces in the
+			// codeownerLine, then the filepath must
+			// be handled accordingly as the space
+			// will not serve as a valid delimiter
+			if (codeownerLine.indexOf('\\ ') !== -1) {
 				codeownerEntry = handleFilepathWithSpace(codeownerLine);
 			} else {
 				codeownerEntry = codeownerLine.split(' ');
@@ -56,6 +51,7 @@ function buildCodeownersMap() {
 					codeownerEntry[0],
 					getCodeowners(codeownerEntry)
 				);
+			} else {
 			}
 		}
 	}
@@ -101,9 +97,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, ignoreList
  		for (let filepathPattern of codeownersFilepaths) {
 			// Universal filepath means that all files
 			// changed in the PR/Push are owned
-			if (filepathPattern == '*'
-				|| filepathPattern == '/'
-			) {
+			if (filepathPattern == '*') {
 				return [];
 			}
 
@@ -177,29 +171,112 @@ function getTeams(token) {
 /*
  * Generates a codeowner entry array
  * given a codeowner line where the
- * filepath contains spaces and thus
- * must be processed accordingly
+ * filepath contains escaped spaces and
+ * thus must be processed accordingly
  */
 function handleFilepathWithSpace(codeownerLine) {
-	let codeownerEntry = [];
+	let codeownerEntry = null;
 	let filepath = '';
 	let indexOfSpace;
 
 	let finished = false;
 	while (!finished) {
-		indexOfSpace = codeownerLine.indexOf(' ');
-		filepath += codeownerLine.substring(0, indexOfSpace + 1);
-		codeownerLine = codeownerLine.substring(indexOfSpace + 1);
-		if (codeownerLine[0] == '@') {
-			// Remove delimiting space from filepath
-			filepath = filepath.substring(0, filepath.length - 1);
-			codeownerEntry.push(filepath, ...codeownerLine.split(' '));
+		// If there are still spaces, continue processing
+		if (codeownerLine.indexOf('\\ ') !== -1) {
+			indexOfSpace = codeownerLine.indexOf('\\ ');
+			filepath += codeownerLine.substring(0, indexOfSpace) + ' ';
+			codeownerLine = codeownerLine.substring(indexOfSpace + 2);
+
+			// If next character is an owner, building the filepath
+			// is complete and processing can finish
+			if (codeownerLine[0] == '@') {
+				// Remove delimiting space from filepath
+				filepath = filepath.substring(0, filepath.length - 1);
+				codeownerEntry.push(filepath, ...codeownerLine.split(' '));
+
+				finished = true;
+			}
+		// If there are no escaped spaces left, but there
+		// are delimiting spaces, split the remaining line
+		// on spaces and build entry accordingly
+		} else if (codeownerLine.indexOf(' ') !== -1) {
+			indexOfSpace = codeownerLine.indexOf(' ');
+			filepath += codeownerLine.substring(0, indexOfSpace);
+			codeownerLine = codeownerLine.substring(indexOfSpace + 1);
+
+			codeownerEntry = [filepath, ...codeownerLine.split(' ')];
+			finished = true;
+
+		// If there are no spaces left, there is no owner specified
+		// on the entry, the filepath should be completed and the
+		// result should be returned
+		} else {
+			filepath += codeownerLine;
+			codeownerEntry = [filepath];
 
 			finished = true;
 		}
 	}
 
 	return codeownerEntry;
+}
+
+/*
+ * Generates a new list of changedFiles to
+ * accommodate retrieving the list of changed
+ * files in a space-delimited format
+ */
+function handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList) {
+	const changedFiles = [];
+	let filepath = '';
+	let indexOfSpace;
+	let indexOfExtension;
+
+	let finished = false;
+	while (!finished) {
+		// For case: early exit as no spaces remain
+		if (changedFilesSpaceDelimitedList.indexOf(' ') === -1) {
+			filepath += changedFilesSpaceDelimitedList;
+			changedFilesSpaceDelimitedList = '';
+
+		// For case: .gitignore, .github/CODEOWNERS and similar
+		// filepaths that are hidden and lack file extensions
+		} else if (changedFilesSpaceDelimitedList.substring(0, 1) == '.') {
+			indexOfSpace = changedFilesSpaceDelimitedList.indexOf(' ');
+			filepath += changedFilesSpaceDelimitedList.substring(
+				0,
+				indexOfSpace
+			);
+			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfSpace + 1);
+
+		// For case: file/path.js and file/path with spaces.js
+		} else {
+			indexOfExtension = changedFilesSpaceDelimitedList.indexOf('.');
+			filepath += changedFilesSpaceDelimitedList.substring(0, indexOfExtension);
+			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfExtension);
+
+			if (changedFilesSpaceDelimitedList.indexOf(' ') !== -1) {
+				indexOfSpace = changedFilesSpaceDelimitedList.indexOf(' ');
+				filepath += changedFilesSpaceDelimitedList.substring(
+					0,
+					indexOfSpace
+				);
+				changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfSpace + 1);
+			} else {
+				filepath += changedFilesSpaceDelimitedList;
+				changedFilesSpaceDelimitedList = '';
+			}
+		}
+
+		changedFiles.push(filepath);
+		filepath = '';
+
+		if (changedFilesSpaceDelimitedList == '') {
+			finished = true;
+		}
+	}
+
+	return changedFiles;
 }
 
 /*
@@ -309,7 +386,7 @@ function removeFromList(list, item) {
 
 /*
  * Orchestrating function of the
- * codeowners-validator GitHub Action.
+ * codeowner verifier GitHub Action.
  * If unowned files (as determined by
  * the CODEOWNERS file) have been added
  * or updated in the push or pull request
@@ -322,7 +399,7 @@ function removeFromList(list, item) {
  * file, errors will be set on the check that
  * identify the invalid owners.
  */
-function validateCodeowners() {
+function verifyCodeowners() {
 	const validTeams = null;
 
 	const repoName = github.context.payload.repository.full_name.split('/')[1];
@@ -331,7 +408,7 @@ function validateCodeowners() {
 	const apiToken = core.getInput(INPUT_API_TOKEN);
 
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
-	const changedFiles = changedFilesSpaceDelimitedList.split(' ');
+	const changedFiles = handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList);
 
 	const ignoreSpaceDelimitedList = core.getInput(INPUT_IGNORE_LIST);
 	const ignoreList = ignoreSpaceDelimitedList.split(' ');
@@ -407,4 +484,4 @@ function validateCodeowners() {
 	);
 }
 
-validateCodeowners();
+verifyCodeowners();
