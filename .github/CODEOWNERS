@@ -22,3 +22,6 @@ objects/ @objectsOwner
 
 # Valid syntax for unowned file
 LICENSE
+
+# Test support for spaces
+src/this is a test/another test.txt @spaceMan
