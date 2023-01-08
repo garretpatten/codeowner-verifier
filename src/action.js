@@ -222,9 +222,10 @@ function handleFilepathWithSpace(codeownerLine) {
 }
 
 /*
- * Generates a new list of changedFiles to
- * accommodate retrieving the list of changed
- * files in a space-delimited format
+ * Generates a list of changedFiles to given
+ * a space-delimited list of changed files
+ * from jitterbit where some of those filepaths
+ * may contain spaces themselves
  */
 function handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList) {
 	const changedFiles = [];
@@ -248,6 +249,11 @@ function handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList) {
 				indexOfSpace
 			);
 			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfSpace + 1);
+
+		// For case: LICENSE
+		} else if (changedFilesSpaceDelimitedList.substring(0, 7) == 'LICENSE') {
+			filepath += changedFilesSpaceDelimitedList.substring(0, 7);
+			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(8);
 
 		// For case: file/path.js and file/path with spaces.js
 		} else {

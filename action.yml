@@ -1,20 +1,20 @@
-name: 'Codeowners Validator'
-description: 'Validates Codeowners file'
+name: 'Codeowner Verifier'
+description: 'Verifies that modified files have an owner specified in the CODEOWNERS file'
 author: 'Garret Patten'
 
 # TODO: Add branding
 
 inputs:
   apiToken:
-    description: 'Secret GitHub token used to retrieve GitHub Teams through the API'
+    description: 'Secret GitHub token used to retrieve GitHub Teams through the GitHub API'
     required: false
     default: null
   changedFiles:
-    description: 'Updated files included in the PR or Push'
+    description: 'Modified files included in the PR or Push'
     required: true
     default: null
   ignoreList:
-     description: 'Space delimited string list of filepath patterns to ignore when evaluating ownership'
+     description: 'Space-delimited string list of filepath patterns to ignore when evaluating ownership'
      required: false
      default: null
   GITHUB_TOKEN:
@@ -23,8 +23,8 @@ inputs:
 
 outputs:
   timestamp:
-    description: 'Codeowners Validator timestamp'
+    description: 'Codeowner Verifier timestamp'
 
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: node16
+  main: dist/index.js
