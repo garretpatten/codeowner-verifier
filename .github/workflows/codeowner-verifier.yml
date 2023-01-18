@@ -11,25 +11,31 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
       - name: Identify Changed Files
         id: diff
-        uses: jitterbit/get-changed-files@v1
-        continue-on-error: true
+        run: |
+          git_diff="$(git diff --name-only origin/$GITHUB_BASE_REF $GITHUB_SHA)"
+          git_diff_fixed="$(echo $git_diff | tr '\n' ' ' )"
+          echo "git_diff=$git_diff_fixed" >> $GITHUB_OUTPUT
+
+      - name: Identify Deleted Files
+        id: deleted
+        run: |
+          git_diff_deleted="$(git diff --name-only --diff-filter=D origin/$GITHUB_BASE_REF $GITHUB_SHA)"
+          git_diff_deleted_fixed="$(echo $git_diff_deleted | tr '\n' ' ' )"
+          echo "git_diff_deleted=$git_diff_deleted_fixed" >> $GITHUB_OUTPUT
 
       - name: Codeowner Verifier
         id: codeownerVerifier
-        uses: garretpatten/codeowner-verifier@v1.1
+        uses: garretpatten/codeowner-verifier@main
         with:
           changedFiles: ${{ steps.diff.outputs.all }}
-          directoryIgnoreList: '.git/ .sfdx/ .idea/ .vscode/ src/dependencies/'
+          deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
+          ignoreList: '.git/ .idea/ .vscode/ node_modules/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Finish and Output Time
         run: |
-          echo "Codeowners Validator has completed."
+          echo "Codeowner Verifer has completed."
           echo "Time: ${{ steps.codeownersValidator.outputs.timestamp }}"

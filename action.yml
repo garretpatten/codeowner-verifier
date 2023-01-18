@@ -13,10 +13,14 @@ inputs:
     description: 'Modified files included in the PR or Push'
     required: true
     default: null
+  deletedFiles:
+    description: 'Moved or deleted files included in the PR or Push'
+    required: true
+    default: null
   ignoreList:
-     description: 'Space-delimited string list of filepath patterns to ignore when evaluating ownership'
-     required: false
-     default: null
+    description: 'Space-delimited string list of filepath patterns to ignore when evaluating ownership'
+    required: false
+    default: null
   GITHUB_TOKEN:
     description: 'GitHub Token'
     required: true

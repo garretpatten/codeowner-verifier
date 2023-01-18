@@ -10,6 +10,7 @@ const minimatch = require('minimatch');
 /* I/O */
 const INPUT_API_TOKEN = 'apiToken';
 const INPUT_CHANGED_FILES = 'changedFiles';
+const INPUT_DELETED_FILES = 'deletedFiles';
 const INPUT_IGNORE_LIST = 'ignoreList'
 const OUTPUT_TIMESTAMP = 'timestamp';
 
@@ -35,7 +36,7 @@ function buildCodeownersMap() {
 			// If there are escaped spaces in the
 			// codeownerLine, then the filepath must
 			// be handled accordingly as the space
-			// will not serve as a valid delimiter
+			// will not serve as a valid delimiter.
 			if (codeownerLine.indexOf('\\ ') !== -1) {
 				codeownerEntry = handleFilepathWithSpace(codeownerLine);
 			} else {
@@ -44,14 +45,13 @@ function buildCodeownersMap() {
 
 			// Codeowner entries with only a file path
 			// are valid but considered unowned, thus
-			// they should not be added to the map
+			// they should not be added to the map.
 			if (codeownerEntry.length > 1) {
 				codeownerEntry[0] = cleanPath(codeownerEntry[0]);
 				codeownersMap.set(
 					codeownerEntry[0],
 					getCodeowners(codeownerEntry)
 				);
-			} else {
 			}
 		}
 	}
@@ -60,7 +60,7 @@ function buildCodeownersMap() {
 }
 
 /*
- * Cleans CODEOWNERS filepaths patterns
+ * Cleans CODEOWNERS filepath patterns
  * to facilitate filepath pattern to
  * filepath direct matching. Filepaths
  * that start with '/' will have the beginning
@@ -83,27 +83,29 @@ function cleanPath(filepath) {
  * been changed that do not have explicit
  * ownership defined in the CODEOWNERS file.
  */
-function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, ignoreList) {
+function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, deletedFiles, ignoreList) {
 	const codeownersFilepaths = [...codeownersMap.keys()];
 	let changedFilesWithoutOwnership = [...changedFiles];
 
+	let filesToFilterOut = [];
+	filesToFilterOut = ignoreList != '' ? filesToFilterOut.concat(ignoreList) : filesToFilterOut;
+	filesToFilterOut = deletedFiles != '' ? filesToFilterOut.concat(deletedFiles) : filesToFilterOut;
+
 	for (let filepath of changedFiles) {
-		ignoreList.forEach((path) => {
+		filesToFilterOut.forEach((path) => {
 			if (filepath.includes(path)) {
 				removeFromList(changedFilesWithoutOwnership, filepath);
 			}
 		});
 
- 		for (let filepathPattern of codeownersFilepaths) {
-			// Universal filepath means that all files
-			// changed in the PR/Push are owned
+		for (let filepathPattern of codeownersFilepaths) {
+			// Universal filepath means that
+			// all changed files are owned.
 			if (filepathPattern == '*') {
 				return [];
 			}
 
 			if (isMatch(filepath, filepathPattern)) {
-				console.log('a match has been found for: ' + filepath + ' and ' + filepathPattern);
-				console.log('');
 				removeFromList(changedFilesWithoutOwnership, filepath);
 			}
 		}
@@ -222,13 +224,66 @@ function handleFilepathWithSpace(codeownerLine) {
 }
 
 /*
- * Generates a list of changedFiles to given
- * a space-delimited list of changed files
- * from jitterbit where some of those filepaths
- * may contain spaces themselves
+ * Generates a codeowner entry array
+ * given a codeowner line where the
+ * filepath contains escaped spaces and
+ * thus must be processed accordingly.
  */
-function handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList) {
-	const changedFiles = [];
+function handleFilepathWithSpace(codeownerLine) {
+	let codeownerEntry = null;
+	let filepath = '';
+	let indexOfSpace;
+
+	let finished = false;
+	while (!finished) {
+		// If there are still spaces, continue processing.
+		if (codeownerLine.indexOf('\\ ') !== -1) {
+			indexOfSpace = codeownerLine.indexOf('\\ ');
+			filepath += codeownerLine.substring(0, indexOfSpace) + ' ';
+			codeownerLine = codeownerLine.substring(indexOfSpace + 2);
+
+			// If next character is an owner, building the filepath
+			// is complete and processing can finish.
+			if (codeownerLine[0] == '@') {
+				// Remove delimiting space from filepath.
+				filepath = filepath.substring(0, filepath.length - 1);
+				codeownerEntry.push(filepath, ...codeownerLine.split(' '));
+
+				finished = true;
+			}
+		// If there are no escaped spaces left, but there
+		// are delimiting spaces, split the remaining line
+		// on spaces and build entry accordingly.
+		} else if (codeownerLine.indexOf(' ') !== -1) {
+			indexOfSpace = codeownerLine.indexOf(' ');
+			filepath += codeownerLine.substring(0, indexOfSpace);
+			codeownerLine = codeownerLine.substring(indexOfSpace + 1);
+
+			codeownerEntry = [filepath, ...codeownerLine.split(' ')];
+			finished = true;
+
+		// If there are no spaces left, then there is no owner
+		// specified on the entry. The filepath should be
+		// completed, and the result should be returned.
+		} else {
+			filepath += codeownerLine;
+			codeownerEntry = [filepath];
+
+			finished = true;
+		}
+	}
+
+	return codeownerEntry;
+}
+
+/*
+ * Generates a list of filepaths given
+ * a space-delimited list of changed files
+ * from the GitHub CLI where some of those
+ * filepaths may contain whitespace.
+ */
+function handleWhiteSpaceInFilepaths(filesSpaceDelimitedList) {
+	const filepaths = [];
 	let filepath = '';
 	let indexOfSpace;
 	let indexOfExtension;
@@ -236,53 +291,53 @@ function handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList) {
 	let finished = false;
 	while (!finished) {
 		// For case: early exit as no spaces remain
-		if (changedFilesSpaceDelimitedList.indexOf(' ') === -1) {
-			filepath += changedFilesSpaceDelimitedList;
-			changedFilesSpaceDelimitedList = '';
+		if (filesSpaceDelimitedList.indexOf(' ') === -1) {
+			filepath += filesSpaceDelimitedList;
+			filesSpaceDelimitedList = '';
 
 		// For case: .gitignore, .github/CODEOWNERS and similar
 		// filepaths that are hidden and lack file extensions
-		} else if (changedFilesSpaceDelimitedList.substring(0, 1) == '.') {
-			indexOfSpace = changedFilesSpaceDelimitedList.indexOf(' ');
-			filepath += changedFilesSpaceDelimitedList.substring(
+		} else if (filesSpaceDelimitedList.substring(0, 1) == '.') {
+			indexOfSpace = filesSpaceDelimitedList.indexOf(' ');
+			filepath += filesSpaceDelimitedList.substring(
 				0,
 				indexOfSpace
 			);
-			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfSpace + 1);
+			filesSpaceDelimitedList = filesSpaceDelimitedList.substring(indexOfSpace + 1);
 
 		// For case: LICENSE
-		} else if (changedFilesSpaceDelimitedList.substring(0, 7) == 'LICENSE') {
-			filepath += changedFilesSpaceDelimitedList.substring(0, 7);
-			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(8);
+		} else if (filesSpaceDelimitedList.substring(0, 7) == 'LICENSE') {
+			filepath += filesSpaceDelimitedList.substring(0, 7);
+			filesSpaceDelimitedList = filesSpaceDelimitedList.substring(8);
 
 		// For case: file/path.js and file/path with spaces.js
 		} else {
-			indexOfExtension = changedFilesSpaceDelimitedList.indexOf('.');
-			filepath += changedFilesSpaceDelimitedList.substring(0, indexOfExtension);
-			changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfExtension);
+			indexOfExtension = filesSpaceDelimitedList.indexOf('.');
+			filepath += filesSpaceDelimitedList.substring(0, indexOfExtension);
+			filesSpaceDelimitedList = filesSpaceDelimitedList.substring(indexOfExtension);
 
-			if (changedFilesSpaceDelimitedList.indexOf(' ') !== -1) {
-				indexOfSpace = changedFilesSpaceDelimitedList.indexOf(' ');
-				filepath += changedFilesSpaceDelimitedList.substring(
+			if (filesSpaceDelimitedList.indexOf(' ') !== -1) {
+				indexOfSpace = filesSpaceDelimitedList.indexOf(' ');
+				filepath += filesSpaceDelimitedList.substring(
 					0,
 					indexOfSpace
 				);
-				changedFilesSpaceDelimitedList = changedFilesSpaceDelimitedList.substring(indexOfSpace + 1);
+				filesSpaceDelimitedList = filesSpaceDelimitedList.substring(indexOfSpace + 1);
 			} else {
-				filepath += changedFilesSpaceDelimitedList;
-				changedFilesSpaceDelimitedList = '';
+				filepath += filesSpaceDelimitedList
+				filesSpaceDelimitedList = '';
 			}
 		}
 
-		changedFiles.push(filepath);
+		filepaths.push(filepath);
 		filepath = '';
 
-		if (changedFilesSpaceDelimitedList == '') {
+		if (filesSpaceDelimitedList == '') {
 			finished = true;
 		}
 	}
 
-	return changedFiles;
+	return filepaths;
 }
 
 /*
@@ -375,7 +430,7 @@ function isMatch(filepath, filepathPattern) {
  * Helper function to remove a specific
  * item from a given list using the
  * index of the item. A check has been
- * added to avoid errant removal of the
+ * added to avoid errant removal of an
  * incorrect item.
  */
 function removeFromList(list, item) {
@@ -416,6 +471,9 @@ function verifyCodeowners() {
 	const changedFilesSpaceDelimitedList = core.getInput(INPUT_CHANGED_FILES);
 	const changedFiles = handleWhiteSpaceForChangedFiles(changedFilesSpaceDelimitedList);
 
+	const deletedFilesSpaceDelimitedList = core.getInput(INPUT_DELETED_FILES);
+	const deletedFiles = handleWhiteSpaceInFilepaths(deletedFilesSpaceDelimitedList);
+
 	const ignoreSpaceDelimitedList = core.getInput(INPUT_IGNORE_LIST);
 	const ignoreList = ignoreSpaceDelimitedList.split(' ');
 
@@ -437,6 +495,7 @@ function verifyCodeowners() {
 	const changedFilesWithoutOwnership = getChangedFilesWithoutOwnership(
 		changedFiles,
 		codeownersMap,
+		deletedFiles,
 		ignoreList
 	);
 
@@ -468,7 +527,7 @@ function verifyCodeowners() {
 			+ 'following the CODEOWNERS example file from GitHub Docs found here:' + '\n'
 			+ 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file' + '\n'
 			+ 'If files should be ignored or have no ownership, they can be added to the .github/workflows/codeowners-validator.yml file. '
-			+ 'For reference, see the `ignoreList` parameter in the codeowners-validator README found here:' + '\n'
+			+ 'For reference, see the `ignoreList` parameter in the codeowner-verifier README found here:' + '\n'
 			+ 'https://github.com/garretpatten/codeowners-validator#ignorelist'
 	}
 
