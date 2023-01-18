@@ -31,4 +31,4 @@ The `ignoreList` is an optional parameter that allows a repository to dictate ce
 The `GITHUB_TOKEN` is a required parameter that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context.
 
 ## Maintainers
-[@GarretPatten](https://github.com/garretpatten).
+[@GarretPatten](https://github.com/garretpatten)
