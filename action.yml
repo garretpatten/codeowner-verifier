@@ -1,8 +1,6 @@
 name: 'Codeowner Verifier'
-description: 'Verifies that modified files have an owner specified in the CODEOWNERS file'
+description: 'A GitHub Action to ensure that modified files are owned in the CODEOWNERS file'
 author: 'Garret Patten'
-
-# TODO: Add branding
 
 inputs:
   apiToken:
