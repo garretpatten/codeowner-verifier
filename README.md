@@ -1,8 +1,6 @@
 # codeowner-verifier
 A GitHub Action to verify CODEOWNERS files -- both that all files included in a PR or push are owned and (if an apiToken is passed) that all owners in the CODEOWNERS file are valid Teams within the GitHub organization in context.
 
-_CODE UNDER ACTIVE DEVELOPMENT_
-
 ## Table of Contents
 - [Usage](#usage),
     - [Action Parameters](#action-parameters)
