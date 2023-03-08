@@ -1,10 +1,6 @@
 name: 'Codeowner Verifier Workflow'
 
-on:
-  pull_request:
-  push:
-    branches:
-      - main
+on: pull_request
 
 jobs:
   codeowner-verifier-workflow:
