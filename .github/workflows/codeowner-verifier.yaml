@@ -1,12 +1,10 @@
-name: 'Codeowner Verifier Workflow'
+name: 'codeowner-verifier'
 
 on: pull_request
 
 jobs:
-  codeowner-verifier-workflow:
-
+  codeowner-verifier:
     runs-on: ubuntu-latest
-
       - name: Identify Changed Files
         id: diff
         run: |
@@ -22,16 +20,16 @@ jobs:
           echo "git_diff_deleted=$git_diff_deleted_fixed" >> $GITHUB_OUTPUT
 
       - name: Codeowner Verifier
-        id: codeownerVerifier
+        id: codeowner-verifier
         uses: garretpatten/codeowner-verifier@main
         with:
           changedFiles: ${{ steps.diff.outputs.all }}
           deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
-          ignoreList: '.git/ .idea/ .vscode/ node_modules/'
+          ignoreList: '.git/ .vscode/ node_modules/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Finish and Output Time
         run: |
           echo "Codeowner Verifer has completed."
-          echo "Time: ${{ steps.codeownersValidator.outputs.timestamp }}"
+          echo "Time: ${{ steps.codeowner-verifier.outputs.timestamp }}"
