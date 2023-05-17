@@ -14,4 +14,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: semgrep scan --sarif --output=semgrep.sarif --config=policy
+      - run: semgrep ci --config=auto
