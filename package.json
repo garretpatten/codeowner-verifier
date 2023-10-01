@@ -1,36 +1,26 @@
 {
   "name": "codeowner-verifier",
-  "version": "1.2.0",
-  "description": "A GitHub Action to ensure that modified files are owned in the CODEOWNERS file",
+  "author": "Garret Patten",
+  "version": "2.1",
+  "description": "A GitHub Action that verifies that modified files are owned by codeowners",
+  "private": true,
   "main": "dist/index.js",
-  "scripts": {
-    "build": "ncc build src/action.js --minify",
-    "test": "node test/action.test.js"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/garretpatten/codeowner-verifier.git"
+    "url": "git+https://github.com/ncino/codeowner-verifier.git"
   },
-  "keywords": [
-    "codeowner",
-    "codeowners",
-    "codeowner verifier",
-    "codeowners verifier",
-    "code ownership"
-  ],
-  "author": "Garret Patten",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/garretpatten/codeowners-validator/issues"
+  "license": "",
+  "homepage": "https://github.com/ncino/codeowner-verifier#readme",
+  "scripts": {
+    "build": "ncc build src/action.js --minify"
   },
-  "homepage": "https://github.com/garretpatten/codeowner-verifier#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.0.3",
-    "@vercel/ncc": "^0.36.1",
+    "@vercel/ncc": "^0.34.0",
     "fs": "^0.0.1-security",
-    "minimatch": "^7.4.2",
-    "octokit": "^2.0.14"
+    "minimatch": "^5.1.0",
+    "octokit": "^2.0.4"
   },
   "prettier": {
     "singleQuote": true

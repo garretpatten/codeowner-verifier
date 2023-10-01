@@ -1,17 +1,15 @@
 # Contributing Guide
 
 ## Creating a GitHub Issue
-
-_GitHub Issues should be used to request new rules and to track needed bug fixes and enhancements_
-
+*GitHub Issues should be used to request new rules and to track needed bug fixes and enhancements*
 1. If a GitHub Issue does not exist to capture your intended changes, create a GitHub Issue for this repository.
 2. Name the Issue according to its type in the following format:
-   - [Bug] A descriptive title for the bug being logged
-   - [Feature] A descriptive title of the requested feature
+	- [Bug] A descriptive title for the bug being logged
+	- [Feature] A descriptive title of the requested feature
 3. Fill out the Issue Template:
-   - Add an Issue Description.
-   - If the Issue was observed in a specific workflow run, link that workflow run (or paste a screenshot of the output) under Issue Reference(s).
-   - Include any useful, supplemental information/screenshots in the Additional Information section.
+	- Add an Issue Description.
+	- If the Issue was observed in a specific workflow run, link that workflow run (or paste a screenshot of the output) under Issue Reference(s).
+	- Include any useful, supplemental information/screenshots in the Additional Information section.
 4. Submit the Issue.
 
 ## Resolving a GitHub Issue

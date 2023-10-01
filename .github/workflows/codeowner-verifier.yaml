@@ -1,10 +1,21 @@
-name: 'codeowner-verifier'
+name: Codeowner Verifier
 
 on: pull_request
 
+permissions:
+  contents: read
+
 jobs:
-  codeowner-verifier:
+  codeowner-verifier-workflow:
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        with:
+          fetch-depth: 0
+
       - name: Identify Changed Files
         id: diff
         run: |
@@ -20,16 +31,15 @@ jobs:
           echo "git_diff_deleted=$git_diff_deleted_fixed" >> $GITHUB_OUTPUT
 
       - name: Codeowner Verifier
-        id: codeowner-verifier
-        uses: garretpatten/codeowner-verifier@main
+        id: codeownerVerifier
+        uses: ncino/codeowner-verifier@7f8d3903f5ee2571e21ae8c0fd1a5baa2e2b4846
         with:
-          changedFiles: ${{ steps.diff.outputs.all }}
+          changedFiles: ${{ steps.diff.outputs.git_diff }}
           deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
-          ignoreList: '.git/ .vscode/ node_modules/'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DEVOPS_GITHUB_TOKEN }}
 
       - name: Finish and Output Time
         run: |
-          echo "Codeowner Verifer has completed."
-          echo "Time: ${{ steps.codeowner-verifier.outputs.timestamp }}"
+          echo "Codeowner Verifier has completed."
+          echo "Time: ${{ steps.codeownerVerifier.outputs.timestamp }}"

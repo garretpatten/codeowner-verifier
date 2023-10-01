@@ -1,12 +1,8 @@
 name: 'Codeowner Verifier'
-description: 'A GitHub Action to ensure that modified files are owned in the CODEOWNERS file'
+description: 'A GitHub Action that verifies that modified files are owned by codeowners'
 author: 'Garret Patten'
 
 inputs:
-  apiToken:
-    description: 'Secret GitHub token used to retrieve GitHub Teams through the GitHub API'
-    required: false
-    default: null
   changedFiles:
     description: 'Modified files included in the PR or Push'
     required: true
@@ -14,10 +10,6 @@ inputs:
   deletedFiles:
     description: 'Moved or deleted files included in the PR or Push'
     required: true
-    default: null
-  ignoreList:
-    description: 'Space-delimited string list of filepath patterns to ignore when evaluating ownership'
-    required: false
     default: null
   GITHUB_TOKEN:
     description: 'GitHub Token'
@@ -28,5 +20,5 @@ outputs:
     description: 'Codeowner Verifier timestamp'
 
 runs:
-  using: node16
+  using: node20
   main: dist/index.js
