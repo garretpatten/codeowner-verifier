@@ -20,7 +20,7 @@
     "@vercel/ncc": "^0.34.0",
     "fs": "^0.0.1-security",
     "minimatch": "^5.1.0",
-    "octokit": "^2.0.4"
+    "octokit": "^3.1.2"
   },
   "prettier": {
     "singleQuote": true
