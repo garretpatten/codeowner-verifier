@@ -1,3 +1,5 @@
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
+
 # codeowner-verifier
 A GitHub Action that verifies that modified files are owned by codeowners. This Action is intended to run on pull requests to enforce code ownership defined in a repository's CODEOWNERS file.
 
