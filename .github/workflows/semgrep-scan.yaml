@@ -1,6 +1,6 @@
 name: Semgrep
 
-on: pull_request
+on: [pull_request,push]
 
 jobs:
   semgrep:
@@ -11,6 +11,6 @@ jobs:
 
     if: (github.actor != 'dependabot[bot]')
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
 
       - run: semgrep ci --config=auto
