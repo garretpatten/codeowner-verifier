@@ -1,4 +1,4 @@
-name: Scorecard Analysis
+name: OSSF Scorecard Analysis
 
 on:
   push:
