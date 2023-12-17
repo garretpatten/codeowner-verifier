@@ -31,7 +31,7 @@ jobs:
           echo "git_diff_deleted=$git_diff_deleted_fixed" >> $GITHUB_OUTPUT
 
       - name: Codeowner Verifier
-        uses: garretpatten/codeowner-verifier@7f8d3903f5ee2571e21ae8c0fd1a5baa2e2b4846
+        uses: garretpatten/codeowner-verifier@80cad4a86a0dbc1711aa055fe395103b1fdf10c6
         with:
           changedFiles: ${{ steps.diff.outputs.git_diff }}
           deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
