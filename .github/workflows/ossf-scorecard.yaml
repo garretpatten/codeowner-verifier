@@ -1,6 +1,8 @@
 name: Scorecard Analysis
 
-on: [pull_request, push]
+on:
+  push:
+    branches: [main]
 
 permissions: read-all
 
