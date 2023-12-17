@@ -1,8 +1,8 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![Issues](https://img.shields.io/github/issues/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/issues)
-[![Latest Release](https://img.shields.io/github/v/release/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/releases)
 [![License MIT](https://img.shields.io/github/license/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/blob/master/LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
+[![Release](https://img.shields.io/github/v/release/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/releases)
 
 # codeowner-verifier
 A GitHub Action that verifies that modified files are owned by codeowners. This Action is intended to run on pull requests to enforce code ownership defined in a repository's CODEOWNERS file.
