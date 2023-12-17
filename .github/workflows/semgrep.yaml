@@ -3,7 +3,7 @@ name: Semgrep SAST Scan
 on: [pull_request,push]
 
 jobs:
-  semgrep:
+  semgrep-sast-scan:
     runs-on: ubuntu-latest
 
     container:

@@ -6,7 +6,7 @@ permissions:
 on: [pull_request, push]
 
 jobs:
-  Trufflehog:
+  trufflehog-secrets-scanner:
     runs-on: ubuntu-latest
 
     if: ${{ github.actor != 'dependabot[bot]' }}

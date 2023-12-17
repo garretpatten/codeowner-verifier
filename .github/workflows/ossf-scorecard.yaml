@@ -7,7 +7,7 @@ on:
 permissions: read-all
 
 jobs:
-  scorecard-analysis:
+  ossf-scorecard-analysis:
     name: Scorecard analysis
     runs-on: ubuntu-latest
     permissions:
