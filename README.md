@@ -1,3 +1,7 @@
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Issues](https://img.shields.io/github/issues/creyD/prettier_action)](https://github.com/creyD/prettier_action/issues)
+[![Latest Release](https://img.shields.io/github/v/release/creyD/prettier_action)](https://github.com/creyD/prettier_action/releases)
+[![License MIT](https://img.shields.io/github/license/creyD/prettier_action)](https://github.com/creyD/prettier_action/blob/master/LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
 
 # codeowner-verifier
