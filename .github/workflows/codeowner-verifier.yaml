@@ -37,9 +37,4 @@ jobs:
           changedFiles: ${{ steps.diff.outputs.git_diff }}
           deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
         env:
-          GITHUB_TOKEN: ${{ secrets.DEVOPS_GITHUB_TOKEN }}
-
-      - name: Finish and Output Time
-        run: |
-          echo "Codeowner Verifier has completed."
-          echo "Time: ${{ steps.codeownerVerifier.outputs.timestamp }}"
+          GITHUB_TOKEN: ${{ secrets.CODEOWNER_VERIFIER_TOKEN }}

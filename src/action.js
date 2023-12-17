@@ -428,8 +428,6 @@ function verifyCodeowners() {
   if (errorMessage != null) {
     core.setFailed(errorMessage);
   }
-
-  core.setOutput(OUTPUT_TIMESTAMP, new Date().toTimeString());
 }
 
 verifyCodeowners();

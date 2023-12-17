@@ -15,10 +15,6 @@ inputs:
     description: 'GitHub Token'
     required: true
 
-outputs:
-  timestamp:
-    description: 'Codeowner Verifier timestamp'
-
 runs:
   using: node20
   main: dist/index.js

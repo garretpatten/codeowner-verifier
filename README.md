@@ -30,7 +30,7 @@ This GitHub Action has been built to be consumed by organizations and individual
 `deletedFiles` is a required parameter that facilitates the processing of moved and deleted files in the context of the CODEOWNERS file. `deletedFiles` expects to receive a space-delimited list of the filepaths that have been moved or deleted in a given PR or push operation. The example workflow in this repository uses the GitHub CLI to generate the list for this parameter.
 ### Environment Variables
 #### GITHUB_TOKEN
-The `GITHUB_TOKEN` is a required environment variable that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context. The codeowner-verifier workflow in this repository uses the shared `DEVOPS_GITHUB_TOKEN` (associated with the CI user) for this parameter.
+The `GITHUB_TOKEN` is a required environment variable that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context. The codeowner-verifier workflow in this repository uses the shared `CODEOWNER_VERIFIER_TOKEN` for this parameter.
 ### Files
 #### .codeownersignore
 The `.codeownersignore` is an optional file at the root directory that allows a repository to dictate certain filepaths to ignore when validating the CODEOWNERS file. This ignore file is meant to be used for filepaths like `node_modules`, `.gitignore`, `README.md`, and any other files where it may not make sense to require an explicit owner in the CODEOWNERS file. It should be used like a `.gitignore` file with one filepath pattern per line that gets ignored.
