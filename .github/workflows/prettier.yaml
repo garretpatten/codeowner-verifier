@@ -1,18 +1,28 @@
 name: Prettier
 
-on: [pull_request, push]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   prettier:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      # TODO: Pin at full length commit SHA
       - name: Prettify code
-        uses: creyD/prettier_action@v4.3
+        uses: creyD/prettier_action@31355f8eef017f8aeba2e0bc09d8502b13dbbad1
+        with:
+          prettier_options: --write **/*.{js,md}
+          only_changed: True
+          github_token: ${{ secrets.PRETTIER_TOKEN }}
