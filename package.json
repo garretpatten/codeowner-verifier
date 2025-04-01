@@ -1,7 +1,7 @@
 {
   "name": "codeowner-verifier",
   "author": "Garret Patten",
-  "version": "3.0.0",
+  "version": "3.0",
   "description": "A GitHub Action that verifies that modified files are owned by codeowners",
   "private": true,
   "main": "dist/index.js",
