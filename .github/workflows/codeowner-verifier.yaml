@@ -35,5 +35,4 @@ jobs:
         with:
           changedFiles: ${{ steps.diff.outputs.git_diff }}
           deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
-        env:
           GITHUB_TOKEN: ${{ secrets.CODEOWNER_VERIFIER_TOKEN }}
