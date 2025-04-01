@@ -47,3 +47,9 @@ The `.codeownersignore` is an optional file within the `.github` directory at ro
 ## Maintainers
 
 [@garretpatten](https://www.github.com/garretpatten)
+
+*For questions, bug reports, or feature requests, please open an issue on this repository or contact the maintainer directly.*
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
