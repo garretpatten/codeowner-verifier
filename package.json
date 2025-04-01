@@ -2,7 +2,7 @@
   "name": "codeowner-verifier",
   "author": "Garret Patten",
   "version": "1.3",
-  "description": "A GitHub Action that verifies that modified files are owned by codeowners",
+  "description": "A GitHub Action that verifies that modified files are owned by code owners",
   "private": true,
   "main": "dist/index.js",
   "repository": {
