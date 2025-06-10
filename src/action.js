@@ -60,32 +60,32 @@ function buildCodeownersMap() {
  * of filepath patterns.
  */
 function buildIgnoreList() {
-	const ignoreList = [];
-	const codeownersIgnoreOldPath = '.codeownersignore';
-	const codeownersIgnorePath = '.github/.codeownersignore';
+    const ignoreList = [];
+    const codeownersIgnoreOldPath = '.codeownersignore';
+    const codeownersIgnorePath = '.github/.codeownersignore';
 
-	if (!fs.existsSync(codeownersIgnoreOldPath) && !fs.existsSync(codeownersIgnorePath)) {
-		return ignoreList;
-	}
+    if (!fs.existsSync(codeownersIgnoreOldPath) && !fs.existsSync(codeownersIgnorePath)) {
+        return ignoreList;
+    }
 
-	const ignoreFile = fs.existsSync(codeownersIgnorePath) ?
-		fs.readFileSync(codeownersIgnorePath, 'utf8').split('\n') :
-		fs.readFileSync(codeownersIgnoreOldPath, 'utf8').split('\n');
+    const ignoreFile = fs.existsSync(codeownersIgnorePath) ?
+        fs.readFileSync(codeownersIgnorePath, 'utf8').split('\n') :
+        fs.readFileSync(codeownersIgnoreOldPath, 'utf8').split('\n');
 
-	for (let entry of ignoreFile) {
-		if (entry.substring(0,1) !== '#' && entry.length > 1) {
-			// Remove any inline comments
-			if (entry.indexOf(' #') !== -1) {
-				entry = entry.substring(0, entry.indexOf(' #'));
-			}
+    for (let entry of ignoreFile) {
+        if (entry.substring(0,1) !== '#' && entry.length > 1) {
+            // Remove any inline comments
+            if (entry.indexOf(' #') !== -1) {
+                entry = entry.substring(0, entry.indexOf(' #'));
+            }
 
-			ignoreList.push(
-				cleanPath(entry)
-			);
-		}
-	}
+            ignoreList.push(
+                cleanPath(entry)
+            );
+        }
+    }
 
-	return ignoreList;
+    return ignoreList;
 }
 
 /*
@@ -117,7 +117,7 @@ function getChangedFilesWithoutOwnership(changedFiles, codeownersMap, deletedFil
     let changedFilesWithoutOwnership = [...changedFiles];
 
     let filesToFilterOut = [];
-    filesToFilterOut = ignoreList != '' ? filesToFilterOut.concat(ignoreList) : filesToFilterOut;
+    filesToFilterOut = ignoreList.length !== 0 ? filesToFilterOut.concat(ignoreList) : filesToFilterOut;
     filesToFilterOut = deletedFiles != '' ? filesToFilterOut.concat(deletedFiles) : filesToFilterOut;
 
     for (let filepath of changedFiles) {
@@ -400,8 +400,7 @@ function verifyCodeowners() {
     const deletedFilesSpaceDelimitedList = core.getInput(INPUT_DELETED_FILES);
     const deletedFiles = handleWhiteSpaceInFilepaths(deletedFilesSpaceDelimitedList);
 
-    const ignoreSpaceDelimitedList = core.getInput(INPUT_IGNORE_LIST);
-    const ignoreList = ignoreSpaceDelimitedList.split(' ');
+    const ignoreList = buildIgnoreList();
 
     const codeownersMap = buildCodeownersMap();
 
@@ -414,28 +413,36 @@ function verifyCodeowners() {
 
     let errorMessage = null;
     if (changedFilesWithoutOwnership.length > 0) {
-        errorMessage = '\n' + 'There are files without ownership in this work:' + '\n';
+        errorMessage = '\n' + 'Review the ownership of the following files:' + '\n';
 
         changedFilesWithoutOwnership.forEach((file) => {
-            errorMessage += file + '\n';
+            errorMessage += '    - ' + file + '\n';
         });
 
-        errorMessage +=
-          '\n' +
-          'Please update the CODEOWNERS file to take ownership over the updated files ' +
-          'following the Code Owners best practices within the nCino Development Guide:' +
-          '\n' +
-          'https://github.com/ncino/ncino-development-guide/blob/main/Best%20Practices/Code%20Owners.md' +
-          '\n' +
-          'If files should be ignored or have no ownership, they can be added to the .codeownersignore file. ' +
-          'For reference, see the `.codeownersignore` file information in the codeowner-verifier README:' +
-          '\n' +
-          'https://github.com/ncino/codeowner-verifier#.codeownersignore';
+        errorMessage += '\n' + 'Please update the CODEOWNERS file to take ownership over the updated files '
+            + 'following the Code Owners best practices within the nCino Development Guide:' + '\n'
+            + 'https://github.com/ncino/ncino-development-guide/blob/main/Best%20Practices/Code%20Owners.md.' + '\n'
+            + 'If files should be ignored or have no ownership, they can be added to the .codeownersignore file. '
+            + 'For reference, see the .codeownersignore section of the action\'s README:' + '\n'
+            + 'https://github.com/ncino/codeowner-verifier#codeownersignore';
     }
 
     if (errorMessage != null) {
         core.setFailed(errorMessage);
+        core.setOutput('errorMessage', errorMessage);
     }
 }
 
-verifyCodeowners();
+/*
+ * In Node.js, when a file is run directly (e.g., node action.js),
+ * the require.main === module condition is true. However, when
+ * the file is imported as a module (e.g., in your tests), this
+ * condition is false.
+ */
+if (require.main === module) {
+    verifyCodeowners();
+}
+
+module.exports = {
+    verifyCodeowners
+};
