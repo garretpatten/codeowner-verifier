@@ -22,7 +22,7 @@ A GitHub Action that verifies that all modified files included in a PR or push a
 
 ## Usage
 
-This GitHub Action has been built to be consumed across the nCino organization in both public and private repositories. In order to incorporate this Action into a repository's build process, a workflow file must be added to that respository's `.github/workflows` directory. The workflow file can be named as needed and should mirror kebab-case format of the `codeowner-verifier.yml` file in this repository.
+This GitHub Action has been built to be consumed in both public and private repositories. In order to incorporate this Action into a repository's build process, a workflow file must be added to that respository's `.github/workflows` directory. The workflow file can be named as needed and should mirror kebab-case format of the `codeowner-verifier.yml` file in this repository.
 
 ### Action Parameters
 
@@ -36,7 +36,7 @@ This GitHub Action has been built to be consumed across the nCino organization i
 
 #### GITHUB_TOKEN
 
-The `GITHUB_TOKEN` is a required variable that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context. The codeowner-verifier workflow in this repository uses the shared `DEVOPS_GITHUB_TOKEN` (associated with the CI user) for this parameter.
+The `GITHUB_TOKEN` is a required variable that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context.
 
 ### Files
 
