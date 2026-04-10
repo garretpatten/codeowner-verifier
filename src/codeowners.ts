@@ -37,7 +37,10 @@ export function patternMatchesPath(filepath: string, pattern: string): boolean {
  * Returns {@code true} if the last matching rule in {@code rules} assigns one or more owners
  * to {@code filepath}.
  */
-export function fileHasOwner(filepath: string, rules: readonly CodeownerRule[]): boolean {
+export function fileHasOwner(
+  filepath: string,
+  rules: readonly CodeownerRule[],
+): boolean {
   let last: CodeownerRule | undefined;
   for (const rule of rules) {
     if (patternMatchesPath(filepath, rule.pattern)) {
@@ -99,7 +102,9 @@ function collectOwners(tokens: readonly string[]): string[] {
 /**
  * Splits a CODEOWNERS line when the file path portion contains escaped space sequences (`\ `).
  */
-export function splitLineWithEscapedSpacesInPattern(codeownerLine: string): string[] {
+export function splitLineWithEscapedSpacesInPattern(
+  codeownerLine: string,
+): string[] {
   let filepath = '';
   let rest = codeownerLine;
 
@@ -155,7 +160,7 @@ export function listChangedFilesWithoutOwnership(
   changedFiles: readonly string[],
   rules: readonly CodeownerRule[],
   deletedFiles: readonly string[],
-  ignorePatterns: readonly string[]
+  ignorePatterns: readonly string[],
 ): string[] {
   const deletedSet = new Set(deletedFiles);
   return changedFiles.filter((filepath) => {
@@ -173,7 +178,9 @@ export function listChangedFilesWithoutOwnership(
  * Splits a space-delimited list of repo-relative paths into individual paths. Some paths may contain spaces;
  * this uses file-extension boundaries to recover those entries (same heuristic as the original action).
  */
-export function handleWhiteSpaceInFilepaths(filesSpaceDelimitedList: string): string[] {
+export function handleWhiteSpaceInFilepaths(
+  filesSpaceDelimitedList: string,
+): string[] {
   const filepaths: string[] = [];
   let filepath = '';
   let remaining = filesSpaceDelimitedList;

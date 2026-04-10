@@ -31,11 +31,20 @@ function loadIgnorePatterns(): string[] {
  * (via `core.setFailed`) when any changed file lacks an effective owner, setting the `errorMessage` output.
  */
 export function verifyCodeowners(): void {
-  const changedFiles = handleWhiteSpaceInFilepaths(core.getInput(INPUT_CHANGED_FILES));
-  const deletedFiles = handleWhiteSpaceInFilepaths(core.getInput(INPUT_DELETED_FILES));
+  const changedFiles = handleWhiteSpaceInFilepaths(
+    core.getInput(INPUT_CHANGED_FILES),
+  );
+  const deletedFiles = handleWhiteSpaceInFilepaths(
+    core.getInput(INPUT_DELETED_FILES),
+  );
   const ignorePatterns = loadIgnorePatterns();
   const rules = parseCodeownersFile(readCodeownersText());
-  const unowned = listChangedFilesWithoutOwnership(changedFiles, rules, deletedFiles, ignorePatterns);
+  const unowned = listChangedFilesWithoutOwnership(
+    changedFiles,
+    rules,
+    deletedFiles,
+    ignorePatterns,
+  );
 
   if (unowned.length === 0) {
     return;
@@ -49,7 +58,7 @@ export function verifyCodeowners(): void {
     '\nPlease update the CODEOWNERS file to take ownership over the updated files ' +
     'following the Code Owners best practices within the nCino Development Guide:\n' +
     'https://github.com/ncino/ncino-development-guide/blob/main/Best%20Practices/Code%20Owners.md.\n' +
-    "If files should be ignored or have no ownership, they can be added to the .codeownersignore file. " +
+    'If files should be ignored or have no ownership, they can be added to the .codeownersignore file. ' +
     "For reference, see the .codeownersignore section of the action's README:\n" +
     'https://github.com/ncino/codeowner-verifier#codeownersignore';
 

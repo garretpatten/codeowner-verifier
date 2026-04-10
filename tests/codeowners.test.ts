@@ -63,18 +63,24 @@ file3.js @team3
     it('excludes paths matched by ignore patterns using gitignore semantics (not substring)', () => {
       const rules = parseCodeownersFile('src/ @x\n');
       const changed = ['src/a.js', 'mysrc/b.js'];
-      expect(listChangedFilesWithoutOwnership(changed, rules, [], ['src'])).toEqual(['mysrc/b.js']);
+      expect(
+        listChangedFilesWithoutOwnership(changed, rules, [], ['src']),
+      ).toEqual(['mysrc/b.js']);
     });
 
     it('treats deleted paths as not requiring ownership', () => {
       const rules = parseCodeownersFile('');
-      expect(listChangedFilesWithoutOwnership(['gone.js'], rules, ['gone.js'], [])).toEqual([]);
+      expect(
+        listChangedFilesWithoutOwnership(['gone.js'], rules, ['gone.js'], []),
+      ).toEqual([]);
     });
   });
 
   describe('parseIgnoreFileContent', () => {
     it('strips inline comments after space-hash', () => {
-      expect(parseIgnoreFileContent('README.md # docs\n')).toEqual(['README.md']);
+      expect(parseIgnoreFileContent('README.md # docs\n')).toEqual([
+        'README.md',
+      ]);
     });
   });
 
@@ -95,20 +101,25 @@ file3.js @team3
     });
 
     it('exposes escaped-space splitting for edge cases', () => {
-      expect(splitLineWithEscapedSpacesInPattern('a\\ b @x')).toEqual(['a b', '@x']);
+      expect(splitLineWithEscapedSpacesInPattern('a\\ b @x')).toEqual([
+        'a b',
+        '@x',
+      ]);
     });
   });
 
   describe('handleWhiteSpaceInFilepaths', () => {
     it('splits a simple space-delimited list', () => {
-      expect(handleWhiteSpaceInFilepaths('a.js b.js')).toEqual(['a.js', 'b.js']);
+      expect(handleWhiteSpaceInFilepaths('a.js b.js')).toEqual([
+        'a.js',
+        'b.js',
+      ]);
     });
 
     it('handles dotfiles without extensions', () => {
-      expect(handleWhiteSpaceInFilepaths('.github/CODEOWNERS .gitignore')).toEqual([
-        '.github/CODEOWNERS',
-        '.gitignore',
-      ]);
+      expect(
+        handleWhiteSpaceInFilepaths('.github/CODEOWNERS .gitignore'),
+      ).toEqual(['.github/CODEOWNERS', '.gitignore']);
     });
   });
 });

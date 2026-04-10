@@ -12,8 +12,12 @@ import * as fs from 'fs';
 import { verifyCodeowners } from '../src/action';
 import { clearPatternMatcherCache } from '../src/codeowners';
 
-const readFileSyncMock = fs.readFileSync as jest.MockedFunction<typeof fs.readFileSync>;
-const existsSyncMock = fs.existsSync as jest.MockedFunction<typeof fs.existsSync>;
+const readFileSyncMock = fs.readFileSync as jest.MockedFunction<
+  typeof fs.readFileSync
+>;
+const existsSyncMock = fs.existsSync as jest.MockedFunction<
+  typeof fs.existsSync
+>;
 
 describe('verifyCodeowners (integration)', () => {
   afterEach(() => {
@@ -88,12 +92,29 @@ describe('verifyCodeowners (integration)', () => {
 
     verifyCodeowners();
 
-    expect(core.setFailed).toHaveBeenCalledWith(expect.stringContaining('Review the ownership of the following files:'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file1.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.stringContaining('file2.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file3.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.stringContaining('file4.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file5.js'));
+    expect(core.setFailed).toHaveBeenCalledWith(
+      expect.stringContaining('Review the ownership of the following files:'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file1.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.stringContaining('file2.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file3.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.stringContaining('file4.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file5.js'),
+    );
   });
 
   it('fails when a changed file has no effective owner', () => {
@@ -106,12 +127,29 @@ describe('verifyCodeowners (integration)', () => {
 
     verifyCodeowners();
 
-    expect(core.setFailed).toHaveBeenCalledWith(expect.stringContaining('Review the ownership of the following files:'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file1.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file2.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file3.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.not.stringContaining('file4.js'));
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.stringContaining('file5.js'));
+    expect(core.setFailed).toHaveBeenCalledWith(
+      expect.stringContaining('Review the ownership of the following files:'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file1.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file2.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file3.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.not.stringContaining('file4.js'),
+    );
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.stringContaining('file5.js'),
+    );
   });
 
   it('matches patterns without a leading slash the same way GitHub does', () => {
@@ -156,7 +194,9 @@ describe('verifyCodeowners (integration)', () => {
   });
 
   it('loads .github/.codeownersignore and omits ignored paths from the failure list', () => {
-    existsSyncMock.mockImplementation((p) => String(p) === '.github/.codeownersignore');
+    existsSyncMock.mockImplementation(
+      (p) => String(p) === '.github/.codeownersignore',
+    );
 
     readFileSyncMock.mockImplementation((filepath) => {
       if (filepath === '.github/CODEOWNERS') {
@@ -195,6 +235,9 @@ describe('verifyCodeowners (integration)', () => {
     verifyCodeowners();
 
     expect(core.setFailed).toHaveBeenCalled();
-    expect(core.setOutput).toHaveBeenCalledWith('errorMessage', expect.stringContaining('secret.cfg'));
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'errorMessage',
+      expect.stringContaining('secret.cfg'),
+    );
   });
 });
