@@ -2,7 +2,7 @@
 
 ## Creating a GitHub Issue
 
-_GitHub Issues should be used to request new rules and to track needed bug fixes and enhancements_
+Use GitHub Issues to request new rules and to track bug fixes and enhancements.
 
 1. If a GitHub Issue does not exist to capture your intended changes, create a GitHub Issue for this repository.
 2. Name the Issue according to its type in the following format:

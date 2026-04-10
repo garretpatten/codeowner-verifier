@@ -21,7 +21,8 @@ inputs:
 outputs:
   errorMessage:
     description: >-
-      Set when the check fails: details listing files without an effective code owner. Empty or unset when the check passes.
+      Set when the check fails: details listing files without an effective code owner.
+      Empty or unset when the check passes.
 
 runs:
   using: node20

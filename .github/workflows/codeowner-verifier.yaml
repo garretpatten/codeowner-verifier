@@ -48,7 +48,8 @@ jobs:
         run: apk add --no-cache ca-certificates git
 
       - name: Checkout Code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+        # actions/checkout v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
           token: ${{ github.token }}
@@ -88,16 +89,23 @@ jobs:
         with:
           github-token: ${{ secrets.BOBBY_TABLES_PAT }}
           script: |
+            const footer =
+              '_Please contact @ncino/product-security or join ' +
+              '[#help-product-security](https://ncino.slack.com/archives/C02G4R09NUU) for assistance._';
+            const detail = ${{ toJSON(steps.codeowner-verifier.outputs.errorMessage) }};
+            const body =
+              '> [!WARNING]\n' +
+              '**The Codeowner Verifier has detected changed files without ownership in this pull request.**\n' +
+              '>\n' +
+              detail +
+              '\n>\n' +
+              '> ' +
+              footer;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body:`> [!WARNING]
-                \*\*The Codeowner Verifier has detected changed files without ownership in this pull request.\*\*
-              \>
-              ${{ steps.codeowner-verifier.outputs.errorMessage }}
-              \>
-              \> _Please contact @ncino/product-security or join [#help-product-security](https://ncino.slack.com/archives/C02G4R09NUU) for assistance._`
+              body,
             })
 
       - name: Fail Check if Codeowner Verifier Fails
