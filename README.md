@@ -13,19 +13,18 @@ The runtime entrypoint is the bundled `dist/index.js`, built with [`ncc`](https:
 ## Table of Contents
 
 - [Usage](#usage)
-  - [Action inputs](#action-inputs)
-    - [changedFiles](#changedfiles)
-    - [deletedFiles](#deletedfiles)
-    - [GITHUB_TOKEN](#github_token)
-  - [Supporting files](#supporting-files)
-    - [.codeownersignore](#codeownersignore)
+- [Action inputs](#action-inputs)
+  - [changedFiles](#changedfiles)
+  - [deletedFiles](#deletedfiles)
+- [Supporting files](#supporting-files)
+  - [.codeownersignore](#codeownersignore)
 - [Development](#development)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 
 ## Usage
 
-This action is intended for public and private repositories. Add a workflow under `.github/workflows/` (this repo includes an example in `.github/workflows/codeowner-verifier.yaml`).
+This action is intended for public and private repositories. Add a workflow under `.github/workflows/` (this repo includes an example in `.github/workflows/codeowner-verifier.yaml`). Pin a branch (for example `@master`) or a release tag for reproducible runs.
 
 ### Action inputs
 
@@ -37,9 +36,7 @@ Required. A **space-delimited** list of repository-relative paths for added or m
 
 Required. A **space-delimited** list of repository-relative paths for deleted or moved files (for example from `git diff --diff-filter=D`). Paths listed here are not reported as missing ownership.
 
-#### GITHUB_TOKEN
-
-Required in `action.yml` for compatibility with existing workflows. **This action does not call the GitHub API**; verification only reads `.github/CODEOWNERS`, optional ignore files, and the path lists from the inputs. You may pass `secrets.GITHUB_TOKEN` or another token your workflow already exposes.
+This action does **not** call the GitHub API and does not require `secrets.GITHUB_TOKEN` or any other token in `with:`—only the path lists above.
 
 ### Supporting files
 

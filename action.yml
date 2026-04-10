@@ -1,19 +1,27 @@
 name: 'Codeowner Verifier'
-description: 'A GitHub Action that verifies that modified files are owned by codeowners'
+description: >-
+  Verify that changed files have an effective owner per .github/CODEOWNERS (gitignore-style patterns,
+  last matching rule wins).
 author: 'Garret Patten'
+branding:
+  icon: shield
+  color: blue
 
 inputs:
   changedFiles:
-    description: 'Modified files included in the PR or Push'
+    description: >-
+      Space-delimited repository-relative paths of added or modified files (for example from git diff).
     required: true
-    default: null
+
   deletedFiles:
-    description: 'Moved or deleted files included in the PR or Push'
+    description: >-
+      Space-delimited repository-relative paths of deleted or moved files (for example from git diff --diff-filter=D).
     required: true
-    default: null
-  GITHUB_TOKEN:
-    description: 'GitHub Token'
-    required: true
+
+outputs:
+  errorMessage:
+    description: >-
+      Set when the check fails: details listing files without an effective code owner. Empty or unset when the check passes.
 
 runs:
   using: node20
