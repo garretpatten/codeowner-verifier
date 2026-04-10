@@ -1,4 +1,8 @@
 import {
+  MAX_COMBINED_INPUT_BYTES,
+  shouldSkipForInputSize,
+} from '../src/action';
+import {
   clearPatternMatcherCache,
   fileHasOwner,
   handleWhiteSpaceInFilepaths,
@@ -9,6 +13,19 @@ import {
   patternMatchesPath,
   splitLineWithEscapedSpacesInPattern,
 } from '../src/codeowners';
+
+describe('input size guard', () => {
+  it('skips when combined UTF-8 byte length exceeds the cap', () => {
+    const half = Math.ceil(MAX_COMBINED_INPUT_BYTES / 2) + 1;
+    expect(shouldSkipForInputSize('a'.repeat(half), 'b'.repeat(half))).toBe(
+      true,
+    );
+  });
+
+  it('does not skip under the cap', () => {
+    expect(shouldSkipForInputSize('a', 'b')).toBe(false);
+  });
+});
 
 describe('codeowners (unit)', () => {
   afterEach(() => {

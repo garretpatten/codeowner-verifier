@@ -10,6 +10,23 @@ import {
 const INPUT_CHANGED_FILES = 'changedFiles';
 const INPUT_DELETED_FILES = 'deletedFiles';
 
+/**
+ * Combined UTF-8 byte cap for `changedFiles` + `deletedFiles`. Inputs are passed through the runner
+ * environment; exceeding typical ARG_MAX / env limits can make Docker or Node fail to start the action.
+ */
+export const MAX_COMBINED_INPUT_BYTES = 100_000;
+
+export function shouldSkipForInputSize(
+  changedRaw: string,
+  deletedRaw: string,
+): boolean {
+  return (
+    Buffer.byteLength(changedRaw, 'utf8') +
+      Buffer.byteLength(deletedRaw, 'utf8') >
+    MAX_COMBINED_INPUT_BYTES
+  );
+}
+
 function readCodeownersText(): string {
   return fs.readFileSync('.github/CODEOWNERS', 'utf8');
 }
@@ -31,12 +48,24 @@ function loadIgnorePatterns(): string[] {
  * (via `core.setFailed`) when any changed file lacks an effective owner, setting the `errorMessage` output.
  */
 export function verifyCodeowners(): void {
-  const changedFiles = handleWhiteSpaceInFilepaths(
-    core.getInput(INPUT_CHANGED_FILES),
-  );
-  const deletedFiles = handleWhiteSpaceInFilepaths(
-    core.getInput(INPUT_DELETED_FILES),
-  );
+  const changedRaw = core.getInput(INPUT_CHANGED_FILES);
+  const deletedRaw = core.getInput(INPUT_DELETED_FILES);
+
+  if (shouldSkipForInputSize(changedRaw, deletedRaw)) {
+    const skipReason =
+      'CODEOWNERS verification was skipped: the changed/deleted file lists are too large to pass ' +
+      'through GitHub Actions safely. Inputs are supplied as environment variables for the action process; ' +
+      'very long values can exceed OS limits on argument/environment size (execve ARG_MAX) and cause ' +
+      'the runner or Docker to fail before the action starts. Split the PR, reduce the diff, or verify ' +
+      'CODEOWNERS locally.';
+    core.warning(skipReason);
+    core.setOutput('skipped', 'true');
+    core.setOutput('skipReason', skipReason);
+    return;
+  }
+
+  const changedFiles = handleWhiteSpaceInFilepaths(changedRaw);
+  const deletedFiles = handleWhiteSpaceInFilepaths(deletedRaw);
   const ignorePatterns = loadIgnorePatterns();
   const rules = parseCodeownersFile(readCodeownersText());
   const unowned = listChangedFilesWithoutOwnership(

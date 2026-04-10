@@ -240,4 +240,28 @@ describe('verifyCodeowners (integration)', () => {
       expect.stringContaining('secret.cfg'),
     );
   });
+
+  it('skips verification when inputs exceed the combined size limit without failing', () => {
+    const huge = 'x'.repeat(60_000);
+    jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
+      if (name === 'changedFiles') {
+        return huge;
+      }
+      if (name === 'deletedFiles') {
+        return huge;
+      }
+      return '';
+    });
+    const warnSpy = jest.spyOn(core, 'warning').mockImplementation(() => {});
+
+    verifyCodeowners();
+
+    expect(core.setFailed).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalled();
+    expect(core.setOutput).toHaveBeenCalledWith('skipped', 'true');
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'skipReason',
+      expect.stringContaining('skipped'),
+    );
+  });
 });

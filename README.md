@@ -1,18 +1,19 @@
 # Codeowner Verifier
 
-[code style: prettier](https://github.com/prettier/prettier)
-[Issues](https://github.com/garretpatten/codeowner-verifier/issues)
-[License MIT](https://github.com/garretpatten/codeowner-verifier/blob/master/LICENSE)
-[OpenSSF Scorecard](https://api.securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
-[Release](https://github.com/garretpatten/codeowner-verifier/releases)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Issues](https://img.shields.io/github/issues/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/issues)
+[![License MIT](https://img.shields.io/github/license/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/blob/master/LICENSE)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://api.securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
+[![Release](https://img.shields.io/github/v/release/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/releases)
 
 A GitHub Action that checks whether every **changed** file in a pull request or push has an effective owner according to `.github/CODEOWNERS`. Matching follows [GitHub’s CODEOWNERS rules](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) (gitignore-style patterns, root-anchored paths with a leading `/`, and **last matching pattern wins**—including lines that list a path with no owners).
 
-The runtime entrypoint is the bundled `dist/index.js`, built with `[ncc](https://github.com/vercel/ncc)` from TypeScript sources under `src/`.
+The runtime entrypoint is the bundled `dist/index.js`, built with [`ncc`](https://github.com/vercel/ncc) from TypeScript sources under `src/`.
 
 ## Table of Contents
 
 - [Usage](#usage)
+  - [Limits](#limits)
 - [Action inputs](#action-inputs)
   - [changedFiles](#changedfiles)
   - [deletedFiles](#deletedfiles)
@@ -25,6 +26,12 @@ The runtime entrypoint is the bundled `dist/index.js`, built with `[ncc](https:/
 ## Usage
 
 This action is intended for public and private repositories. Add a workflow under `.github/workflows/` (this repo includes an example in `.github/workflows/codeowner-verifier.yaml`). Pin a branch (for example `@master`) or a release tag for reproducible runs.
+
+### Limits
+
+`changedFiles` and `deletedFiles` are passed through the runner as **environment variables**. If the combined UTF-8 size of both inputs is very large (default cap **100,000 bytes** in this action), verification is **skipped** with a warning and optional outputs `skipped` / `skipReason`, because oversized env payloads can exceed OS limits on environment or argument size (`ARG_MAX` / `execve`) and cause errors such as **Argument list too long** when starting Docker or the action process.
+
+The example workflow measures list size first: if it would exceed the cap, it **does not** invoke the action with that payload, posts an explanatory PR comment, and the job **succeeds** (so CI is not blocked by runner limits). Split very large PRs or run CODEOWNERS checks locally when needed.
 
 ### Action inputs
 
@@ -42,16 +49,16 @@ This action does **not** call the GitHub API and does not require `secrets.GITHU
 
 #### .codeownersignore
 
-Optional. Patterns use the same gitignore-style semantics as CODEOWNERS (via the `[ignore](https://www.npmjs.com/package/ignore)` package). Put the file at `**.github/.codeownersignore`** (preferred) or `**.codeownersignore\*\*`at the repository root (legacy). One pattern per line;`#`starts a comment; inline comments after a space followed by`#` are stripped.
+Optional. Patterns use the same gitignore-style semantics as CODEOWNERS (via the [`ignore`](https://www.npmjs.com/package/ignore) package). Put the file at **`.github/.codeownersignore`** (preferred) or **`.codeownersignore`** at the repository root (legacy). One pattern per line; `#` starts a comment; inline comments after a space and `#` are stripped.
 
 ## Development
 
-- **Requirements:** Node.js and npm (npm **11+** recommended so `.npmrc` `[min-release-age](https://docs.npmjs.com/cli/v11/using-npm/config#min-release-age)` applies during installs).
+- **Requirements:** Node.js and npm (npm **11+** recommended so `.npmrc` [`min-release-age`](https://docs.npmjs.com/cli/v11/using-npm/config#min-release-age) applies during installs).
 - Install: `npm ci`
 - Check types: `npm run typecheck`
 - Test: `npm test`
 - Bundle for the action: `npm run build` (writes `dist/index.js`)
-- **CI:** Pull requests run [Security Checks](https://github.com/garretpatten/security-checks) (Semgrep, TruffleHog, etc.) and [Quality Checks](https://github.com/garretpatten/quality-checks) (Prettier, Markdownlint, Yamllint) via `.github/workflows/security-checks.yaml` and `.github/workflows/quality-checks.yaml`. Local parity: `.prettierignore` excludes `dist/` and `node_modules/`; run `npm run lint:prettier`, `npm run lint:md`, and `npm run lint:yaml` (requires `[yamllint](https://github.com/adrienverge/yamllint)` on your PATH).
+- **CI:** Pull requests run [Security Checks](https://github.com/garretpatten/security-checks) (Semgrep, TruffleHog, etc.) and [Quality Checks](https://github.com/garretpatten/quality-checks) (Prettier, Markdownlint, Yamllint) via `.github/workflows/security-checks.yaml` and `.github/workflows/quality-checks.yaml`. Local parity: `.prettierignore` excludes `dist/` and `node_modules/`; run `npm run lint:prettier`, `npm run lint:md`, and `npm run lint:yaml` (requires [`yamllint`](https://github.com/adrienverge/yamllint) on your PATH).
 
 ## Maintainers
 

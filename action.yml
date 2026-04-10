@@ -23,6 +23,11 @@ outputs:
     description: >-
       Set when the check fails: details listing files without an effective code owner.
       Empty or unset when the check passes.
+  skipped:
+    description: >-
+      Set to the string `true` when verification was skipped because the inputs exceeded the size limit.
+  skipReason:
+    description: Human-readable explanation when `skipped` is set.
 
 runs:
   using: node20
