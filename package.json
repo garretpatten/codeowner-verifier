@@ -16,8 +16,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "lint:prettier": "prettier --check .",
-    "lint:md": "markdownlint-cli2 \"README.md\" \"CONTRIBUTING.md\" \".github/**/*.md\"",
-    "lint:yaml": "yamllint -c .yamllint.yaml .github/ action.yml"
+    "lint:md": "markdownlint-cli2",
+    "lint:yaml": "yamllint -c .yamllint.yaml ."
   },
   "dependencies": {
     "@actions/core": "^1.10.0",

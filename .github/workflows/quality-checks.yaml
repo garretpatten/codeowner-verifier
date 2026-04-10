@@ -6,6 +6,7 @@ on: [pull_request]
 jobs:
   quality-checks:
     name: 'Linters'
+    # Markdown/YAML ignores: repo-root `.markdownlint-cli2.yaml` and `.yamllint.yaml` (`ignore:`).
     # yamllint disable-line rule:line-length
     uses: garretpatten/quality-checks/.github/workflows/quality-checks.yaml@master
     with:
