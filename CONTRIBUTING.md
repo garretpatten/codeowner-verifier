@@ -19,5 +19,5 @@
 1. Assign the GitHub Issue to yourself.
 2. Clone the `codeowner-verifier` repository and create a new branch named `issueX` where X is the Issue number.
 3. Resolve the Issue in your local branch.
-4. Once the intended changes have been made locally, ensure that the `node_modules` are up to date and that a webpack build has been run if the action.js file has been updated (`npm run build` will run a webpack build and output the minified `src/action.js` file to `dist/index.js`).
-5. Push the local changes (including any updates to the `node_modules`, `src/action.js`, and `dist/index.js`) up to a remote branch by the same name and open a Pull Request against the `main` branch (please explain the changes in the Pull Request template and follow the Checklist items); relevant code owners will be requested for review.
+4. Once the intended changes have been made locally, ensure that the `node_modules` are up to date and run `npm test` and `npm run build` when TypeScript sources under `src/` change (`npm run build` bundles `src/action.ts` with `ncc` into `dist/index.js`).
+5. Push the local changes (including any updates to `dist/index.js` when the bundle changed) up to a remote branch by the same name and open a Pull Request against the `main` branch (please explain the changes in the Pull Request template and follow the Checklist items); relevant code owners will be requested for review.
