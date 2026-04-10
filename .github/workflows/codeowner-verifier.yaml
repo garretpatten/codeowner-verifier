@@ -7,6 +7,7 @@ env:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   verify-codeowners:
@@ -87,7 +88,7 @@ jobs:
         id: comment
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
         with:
-          github-token: ${{ secrets.BOBBY_TABLES_PAT }}
+          github-token: ${{ github.token }}
           script: |
             const footer =
               '_Please contact @ncino/product-security or join ' +
