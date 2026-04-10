@@ -54,6 +54,7 @@ Optional. Patterns use the same gitignore-style semantics as CODEOWNERS (via the
 - Check types: `npm run typecheck`
 - Test: `npm test`
 - Bundle for the action: `npm run build` (writes `dist/index.js`)
+- **CI:** Pull requests run [Security Checks](https://github.com/garretpatten/security-checks) (Semgrep, TruffleHog, etc.) and [Quality Checks](https://github.com/garretpatten/quality-checks) (Prettier, Markdownlint, Yamllint) via `.github/workflows/security-checks.yaml` and `.github/workflows/quality-checks.yaml`.
 
 ## Maintainers
 
