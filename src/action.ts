@@ -55,12 +55,10 @@ export function verifyCodeowners(): void {
     errorMessage += `    - ${file}\n`;
   }
   errorMessage +=
-    '\nPlease update the CODEOWNERS file to take ownership over the updated files ' +
-    'following the Code Owners best practices within the nCino Development Guide:\n' +
-    'https://github.com/ncino/ncino-development-guide/blob/main/Best%20Practices/Code%20Owners.md.\n' +
-    'If files should be ignored or have no ownership, they can be added to the .codeownersignore file. ' +
-    "For reference, see the .codeownersignore section of the action's README:\n" +
-    'https://github.com/ncino/codeowner-verifier#codeownersignore';
+    '\nPlease update `.github/CODEOWNERS` for the paths above. See GitHub’s documentation on code owners:\n' +
+    'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners\n' +
+    'To skip paths without requiring an owner, use `.github/.codeownersignore` (see the action README):\n' +
+    'https://github.com/garretpatten/codeowner-verifier#codeownersignore';
 
   core.setFailed(errorMessage);
   core.setOutput('errorMessage', errorMessage);

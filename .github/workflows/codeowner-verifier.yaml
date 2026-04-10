@@ -90,10 +90,15 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
+            const raw = ${{ toJSON(steps.codeowner-verifier.outputs.errorMessage) }};
+            const detail =
+              raw != null && raw !== ''
+                ? String(raw)
+                : '_(Open the failed **Verify CODEOWNERS** job logs for the file list.)_';
             const footer =
-              '_Please contact @ncino/product-security or join ' +
-              '[#help-product-security](https://ncino.slack.com/archives/C02G4R09NUU) for assistance._';
-            const detail = ${{ toJSON(steps.codeowner-verifier.outputs.errorMessage) }};
+              '_Questions or bugs? [Open an issue](' +
+              `https://github.com/${context.repo.owner}/${context.repo.repo}/issues` +
+              ')._';
             const body =
               '> [!WARNING]\n' +
               '**The Codeowner Verifier has detected changed files without ownership in this pull request.**\n' +

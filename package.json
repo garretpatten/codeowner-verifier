@@ -7,10 +7,10 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ncino/codeowner-verifier.git"
+    "url": "git+https://github.com/garretpatten/codeowner-verifier.git"
   },
   "license": "",
-  "homepage": "https://github.com/ncino/codeowner-verifier#readme",
+  "homepage": "https://github.com/garretpatten/codeowner-verifier#readme",
   "scripts": {
     "build": "ncc build src/action.ts --minify",
     "typecheck": "tsc --noEmit",
