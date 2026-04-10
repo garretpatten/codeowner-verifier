@@ -11,12 +11,12 @@ A GitHub Action that verifies that all modified files included in a PR or push a
 ## Table of Contents
 
 - [Usage](#usage)
-    - [Action Parameters](#action-parameters)
-        - [changedFiles](#changedFiles)
-        - [deletedFiles](#deletedFiles)
-        - [GITHUB_TOKEN](#GITHUB_TOKEN)
-    - [Files](#files)
-        - [.codeownersignore](#codeownersignore)
+  - [Action Parameters](#action-parameters)
+    - [changedFiles](#changedFiles)
+    - [deletedFiles](#deletedFiles)
+    - [GITHUB_TOKEN](#GITHUB_TOKEN)
+  - [Files](#files)
+    - [.codeownersignore](#codeownersignore)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 
@@ -48,7 +48,7 @@ The `.codeownersignore` is an optional file within the `.github` directory at ro
 
 [@garretpatten](https://www.github.com/garretpatten)
 
-*For questions, bug reports, or feature requests, please open an issue on this repository or contact the maintainer directly.*
+_For questions, bug reports, or feature requests, please open an issue on this repository or contact the maintainer directly._
 
 ## License
 
