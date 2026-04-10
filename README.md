@@ -1,54 +1,74 @@
+# Codeowner Verifier
+
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![Issues](https://img.shields.io/github/issues/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/issues)
 [![License MIT](https://img.shields.io/github/license/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/blob/master/LICENSE)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://api.securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
 [![Release](https://img.shields.io/github/v/release/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/releases)
 
-# Codeowner Verifier
+A GitHub Action that checks whether every **changed** file in a pull request or push has an effective owner according to `.github/CODEOWNERS`. Matching follows [GitHub’s CODEOWNERS rules](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) (gitignore-style patterns, root-anchored paths with a leading `/`, and **last matching pattern wins**—including lines that list a path with no owners).
 
-A GitHub Action that verifies that all modified files included in a PR or push are owned in the CODEOWNERS file.
+The runtime entrypoint is the bundled `dist/index.js`, built with [`ncc`](https://github.com/vercel/ncc) from TypeScript sources under `src/`.
 
 ## Table of Contents
 
 - [Usage](#usage)
-  - [Action Parameters](#action-parameters)
-    - [changedFiles](#changedFiles)
-    - [deletedFiles](#deletedFiles)
-    - [GITHUB_TOKEN](#GITHUB_TOKEN)
-  - [Files](#files)
-    - [.codeownersignore](#codeownersignore)
+  - [Limits](#limits)
+- [Action inputs](#action-inputs)
+  - [changedFiles](#changedfiles)
+  - [deletedFiles](#deletedfiles)
+- [Supporting files](#supporting-files)
+  - [.codeownersignore](#codeownersignore)
+- [Development](#development)
 - [Maintainers](#maintainers)
 - [Contributing](#contributing)
 
 ## Usage
 
-This GitHub Action has been built to be consumed in both public and private repositories. In order to incorporate this Action into a repository's build process, a workflow file must be added to that respository's `.github/workflows` directory. The workflow file can be named as needed and should mirror kebab-case format of the `codeowner-verifier.yml` file in this repository.
+This action is intended for public and private repositories. Add a workflow under `.github/workflows/` (this repo includes an example in `.github/workflows/codeowner-verifier.yaml`). Pin a branch (for example `@master`) or a release tag for reproducible runs.
 
-### Action Parameters
+### Limits
+
+`changedFiles` and `deletedFiles` are passed through the runner as **environment variables**. If the combined UTF-8 size of both inputs is very large (default cap **100,000 bytes** in this action), verification is **skipped** with a warning and optional outputs `skipped` / `skipReason`, because oversized env payloads can exceed OS limits on environment or argument size (`ARG_MAX` / `execve`) and cause errors such as **Argument list too long** when starting Docker or the action process.
+
+The example workflow measures list size first: if it would exceed the cap, it **does not** invoke the action with that payload, posts an explanatory PR comment, and the job **succeeds** (so CI is not blocked by runner limits). Split very large PRs or run CODEOWNERS checks locally when needed.
+
+### Action inputs
 
 #### changedFiles
 
-`changedFiles` is a required parameter that facilitates the processing of updated files in the context of the CODEOWNERS file. `changedFiles` expects to receive a space-delimited list of the filepaths that have been updated in a given PR or push operation. The example workflow in this repository uses the GitHub CLI to generate the list for this parameter.
+Required. A **space-delimited** list of repository-relative paths for added or modified files. The example workflow builds this list with `git diff`.
 
 #### deletedFiles
 
-`deletedFiles` is a required parameter that facilitates the processing of moved and deleted files in the context of the CODEOWNERS file. `deletedFiles` expects to receive a space-delimited list of the filepaths that have been moved or deleted in a given PR or push operation. The example workflow in this repository uses the GitHub CLI to generate the list for this parameter.
+Required. A **space-delimited** list of repository-relative paths for deleted or moved files (for example from `git diff --diff-filter=D`). Paths listed here are not reported as missing ownership.
 
-#### GITHUB_TOKEN
+This action does **not** call the GitHub API and does not require `secrets.GITHUB_TOKEN` or any other token in `with:`—only the path lists above.
 
-The `GITHUB_TOKEN` is a required variable that is needed for the Action to work in the context of a private GitHub organization. A token should be provided that is connected to a user who has requisite access to the repository in context.
-
-### Files
+### Supporting files
 
 #### .codeownersignore
 
-The `.codeownersignore` is an optional file within the `.github` directory at root that allows a repository to dictate certain filepaths to ignore when validating the CODEOWNERS file. This ignore file is meant to be used for filepaths like `node_modules`, `.gitignore`, `README.md`, and any other files where it may not make sense to require an explicit owner in the CODEOWNERS file. It should be used like a `.gitignore` file with one filepath pattern per line that gets ignored.
+Optional. Patterns use the same gitignore-style semantics as CODEOWNERS (via the [`ignore`](https://www.npmjs.com/package/ignore) package). Put the file at **`.github/.codeownersignore`** (preferred) or **`.codeownersignore`** at the repository root (legacy). One pattern per line; `#` starts a comment; inline comments after a space and `#` are stripped.
+
+## Development
+
+- **Requirements:** Node.js and npm (npm **11+** recommended so `.npmrc` [`min-release-age`](https://docs.npmjs.com/cli/v11/using-npm/config#min-release-age) applies during installs).
+- Install: `npm ci`
+- Check types: `npm run typecheck`
+- Test: `npm test`
+- Bundle for the action: `npm run build` (writes `dist/index.js`)
+- **CI:** Pull requests run [Security Checks](https://github.com/garretpatten/security-checks) (Semgrep, TruffleHog, etc.) and [Quality Checks](https://github.com/garretpatten/quality-checks) (Prettier, Markdownlint, Yamllint) via `.github/workflows/security-checks.yaml` and `.github/workflows/quality-checks.yaml`. Local parity: `.prettierignore` excludes `dist/` and `node_modules/`; run `npm run lint:prettier`, `npm run lint:md`, and `npm run lint:yaml` (requires [`yamllint`](https://github.com/adrienverge/yamllint) on your PATH).
 
 ## Maintainers
 
 [@garretpatten](https://www.github.com/garretpatten)
 
 _For questions, bug reports, or feature requests, please open an issue on this repository or contact the maintainer directly._
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
