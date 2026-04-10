@@ -76,7 +76,7 @@ jobs:
       - name: Verify CODEOWNERS
         continue-on-error: true
         id: codeowner-verifier
-        uses: ncino/codeowner-verifier@master
+        uses: garretpatten/codeowner-verifier@master
         with:
           changedFiles: ${{ steps.diff.outputs.git_diff }}
           deletedFiles: ${{ steps.deleted.outputs.git_diff_deleted }}
