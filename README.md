@@ -1,10 +1,26 @@
+<!-- markdownlint-disable-file MD033 MD041 -->
+<div align="center">
+
+<img src="assets/logo.svg" width="88" height="88" alt="Codeowner Verifier logo"/>
+
 # Codeowner Verifier
 
+**Verify that every changed file has an effective owner before merge.**
+
+<sub>GitHub Action · <code>.github/CODEOWNERS</code> · pull requests &amp; pushes</sub>
+
+<br/>
+
+[![GitHub Actions](https://img.shields.io/badge/GitHub-Action-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/garretpatten/codeowner-verifier)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-[![Issues](https://img.shields.io/github/issues/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/issues)
-[![License MIT](https://img.shields.io/github/license/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/blob/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues/garretpatten/codeowner-verifier?style=flat-square)](https://github.com/garretpatten/codeowner-verifier/issues)
+[![License MIT](https://img.shields.io/github/license/garretpatten/codeowner-verifier?style=flat-square)](https://github.com/garretpatten/codeowner-verifier/blob/master/LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/garretpatten/codeowner-verifier/badge)](https://api.securityscorecards.dev/viewer/?uri=github.com/garretpatten/codeowner-verifier)
-[![Release](https://img.shields.io/github/v/release/garretpatten/codeowner-verifier)](https://github.com/garretpatten/codeowner-verifier/releases)
+[![Release](https://img.shields.io/github/v/release/garretpatten/codeowner-verifier?style=flat-square)](https://github.com/garretpatten/codeowner-verifier/releases)
+
+</div>
+
+---
 
 A GitHub Action that checks whether every **changed** file in a pull request or push has an effective owner according to `.github/CODEOWNERS`. Matching follows [GitHub’s CODEOWNERS rules](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) (gitignore-style patterns, root-anchored paths with a leading `/`, and **last matching pattern wins**—including lines that list a path with no owners).
 

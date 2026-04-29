@@ -4,8 +4,8 @@ description: >-
   last matching rule wins).
 author: 'Garret Patten'
 branding:
-  icon: shield
-  color: blue
+  icon: git-pull-request
+  color: purple
 
 inputs:
   changedFiles:
