@@ -1,5 +1,7 @@
 # Contributing Guide
 
+Everyone who participates in this project—issues, pull requests, discussions, or reviews—is expected to follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
 ## Creating a GitHub Issue
 
 Use GitHub Issues to report bugs and request features.

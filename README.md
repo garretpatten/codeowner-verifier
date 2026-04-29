@@ -51,6 +51,7 @@ GitHub can require reviews from code owners, but that is separate from provingâ€
   - [.codeownersignore](#codeownersignore)
 - [Development](#development)
 - [Maintainers](#maintainers)
+- [Code of Conduct](#code-of-conduct)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -134,9 +135,13 @@ Optional. Patterns use the same gitignore-style semantics as CODEOWNERS (via the
 
 _For questions, bug reports, or feature requests, please open an issue on this repository or contact the maintainer directly._
 
+## Code of Conduct
+
+This project follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html). See [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) for the full policy and how to report concerns.
+
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Everyone who participates is expected to follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## License
 
