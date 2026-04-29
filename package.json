@@ -2,14 +2,21 @@
   "name": "codeowner-verifier",
   "author": "Garret Patten",
   "version": "1.3",
-  "description": "A GitHub Action that verifies that modified files are owned by codeowners",
+  "description": "GitHub Action: verify pull request file changes resolve to a CODEOWNERS owner in .github/CODEOWNERS",
   "private": true,
+  "keywords": [
+    "github-actions",
+    "codeowners",
+    "pull-request",
+    "ci",
+    "repository-health"
+  ],
   "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/garretpatten/codeowner-verifier.git"
   },
-  "license": "",
+  "license": "MIT",
   "homepage": "https://github.com/garretpatten/codeowner-verifier#readme",
   "scripts": {
     "build": "ncc build src/action.ts --minify",

@@ -1,11 +1,10 @@
 name: 'Codeowner Verifier'
 description: >-
-  Verify that changed files have an effective owner per .github/CODEOWNERS (gitignore-style patterns,
-  last matching rule wins).
+  Enforce that PR changes have a CODEOWNERS owner (.github/CODEOWNERS; gitignore rules; last match wins).
 author: 'Garret Patten'
 branding:
-  icon: shield
-  color: blue
+  icon: git-pull-request
+  color: purple
 
 inputs:
   changedFiles:
