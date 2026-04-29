@@ -2,17 +2,12 @@
 
 ## Creating a GitHub Issue
 
-Use GitHub Issues to request new rules and to track bug fixes and enhancements.
+Use GitHub Issues to report bugs and request features.
 
-1. If a GitHub Issue does not exist to capture your intended changes, create a GitHub Issue for this repository.
-2. Name the Issue according to its type in the following format:
-   - [Bug] A descriptive title for the bug being logged
-   - [Feature] A descriptive title of the requested feature
-3. Fill out the Issue Template:
-   - Add an Issue Description.
-   - If the Issue was observed in a specific workflow run, link that workflow run (or paste a screenshot of the output) under Issue Reference(s).
-   - Include any useful, supplemental information/screenshots in the Additional Information section.
-4. Submit the Issue.
+1. Open **Issues → New issue** and choose **Bug Report** or **Feature Request** (forms under `.github/ISSUE_TEMPLATE/`).
+2. If the problem appeared in CI, link the workflow run URL and note how you pinned the action (for example `@v2` or a full commit SHA).
+3. Include sample paths or CODEOWNERS snippets only if they are safe to share (redact secrets and private repo details).
+4. Submit the issue.
 
 ## Resolving a GitHub Issue
 
@@ -21,3 +16,11 @@ Use GitHub Issues to request new rules and to track bug fixes and enhancements.
 3. Resolve the Issue in your local branch.
 4. Once the intended changes have been made locally, ensure that the `node_modules` are up to date and run `npm test` and `npm run build` when TypeScript sources under `src/` change (`npm run build` bundles `src/action.ts` with `ncc` into `dist/index.js`).
 5. Push the local changes (including any updates to `dist/index.js` when the bundle changed) up to a remote branch by the same name and open a Pull Request against the `main` branch (please explain the changes in the Pull Request template and follow the Checklist items); relevant code owners will be requested for review.
+
+## Releases and the GitHub Marketplace
+
+This action is consumed from the repository (and the Marketplace listing, if enabled). When you cut a release:
+
+- Tag a [semantic version](https://semver.org/) (for example `v2.1.0`) and move a floating major tag (`v2`) if you follow that convention, so workflows pinned to `@v2` pick up compatible fixes.
+- If you change TypeScript under `src/`, run `npm run build` and commit the updated `dist/index.js` before tagging.
+- Confirm `action.yml` metadata (name, description, inputs, outputs, branding) still matches the README for anyone browsing the Marketplace.
