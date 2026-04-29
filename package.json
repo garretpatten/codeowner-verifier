@@ -27,7 +27,7 @@
     "lint:yaml": "yamllint -c .yamllint.yaml ."
   },
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^2.0.3",
     "ignore": "^7.0.5"
   },
   "devDependencies": {
