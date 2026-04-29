@@ -137,7 +137,7 @@ _For questions, bug reports, or feature requests, please open an issue on this r
 
 ## Code of Conduct
 
-This project follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html). See [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) for the full policy and how to report concerns.
+Short community rules and how to report problems: [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
 
 ## Contributing
 
