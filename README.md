@@ -108,11 +108,12 @@ This action does **not** call the GitHub API and does not require `secrets.GITHU
 
 | Output         | When it is set                                                           | Meaning                                                                                                                    |
 | -------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `unownedFiles` | Same as `errorMessage`                                                   | Newline-separated paths with no effective owner—stable for workflow comments and scripting. Empty when the check passes.   |
 | `errorMessage` | Step **failed** because at least one changed file has no effective owner | Human-readable list of paths to fix in `.github/CODEOWNERS` (or `.github/.codeownersignore`). Empty when the check passes. |
 | `skipped`      | Inputs exceeded the [size limit](#limits)                                | Set to the string `true`; the step succeeds without verifying.                                                             |
 | `skipReason`   | Same as `skipped`                                                        | Explains why verification was skipped.                                                                                     |
 
-Downstream steps can branch on `steps.<id>.outputs.skipped` or inspect `errorMessage` when using `continue-on-error: true` (as in the bundled example workflow).
+Downstream steps can branch on `steps.<id>.outputs.skipped` or inspect `unownedFiles` / `errorMessage` when using `continue-on-error: true` (as in the bundled example workflow).
 
 ## Supporting files
 

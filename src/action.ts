@@ -27,6 +27,32 @@ export function shouldSkipForInputSize(
   );
 }
 
+/** Human-readable failure body for annotations and the `errorMessage` output. */
+export function buildFailureMessage(unowned: string[]): string {
+  let message = '\nReview the ownership of the following files:\n';
+  for (const file of unowned) {
+    message += `    - ${file}\n`;
+  }
+  message +=
+    '\nPlease update `.github/CODEOWNERS` for the paths above. See GitHub’s documentation on code owners:\n' +
+    'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners\n' +
+    'To skip paths without requiring an owner, use `.github/.codeownersignore` (see the action README):\n' +
+    'https://github.com/garretpatten/codeowner-verifier#codeownersignore';
+  return message;
+}
+
+/** Writes each path as its own log line inside a collapsible group (visible in the Actions UI). */
+export function logUnownedFilesForJob(unowned: string[]): void {
+  core.startGroup('Files without an effective CODEOWNERS owner');
+  try {
+    for (const file of unowned) {
+      core.info(file);
+    }
+  } finally {
+    core.endGroup();
+  }
+}
+
 function readCodeownersText(): string {
   return fs.readFileSync('.github/CODEOWNERS', 'utf8');
 }
@@ -79,18 +105,12 @@ export function verifyCodeowners(): void {
     return;
   }
 
-  let errorMessage = '\nReview the ownership of the following files:\n';
-  for (const file of unowned) {
-    errorMessage += `    - ${file}\n`;
-  }
-  errorMessage +=
-    '\nPlease update `.github/CODEOWNERS` for the paths above. See GitHub’s documentation on code owners:\n' +
-    'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners\n' +
-    'To skip paths without requiring an owner, use `.github/.codeownersignore` (see the action README):\n' +
-    'https://github.com/garretpatten/codeowner-verifier#codeownersignore';
-
-  core.setFailed(errorMessage);
+  const errorMessage = buildFailureMessage(unowned);
+  logUnownedFilesForJob(unowned);
+  // Set outputs before marking the step failed so the runner reliably records them for later steps.
+  core.setOutput('unownedFiles', unowned.join('\n'));
   core.setOutput('errorMessage', errorMessage);
+  core.setFailed(errorMessage);
 }
 
 if (require.main === module) {
