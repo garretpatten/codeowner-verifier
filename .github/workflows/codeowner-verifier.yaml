@@ -114,7 +114,9 @@ jobs:
               detail = String(errRaw).trim();
             } else {
               detail =
-                '_(The verifier could not expose the file list from step outputs; open the **Verify CODEOWNERS** step logs — search for **Files without an effective CODEOWNERS owner**.)_';
+                '_(The verifier could not expose the file list from step outputs; ' +
+                'open the **Verify CODEOWNERS** step logs — search for ' +
+                '**Files without an effective CODEOWNERS owner**.)_';
             }
             const footer =
               '_Questions or bugs? [Open an issue](' +
