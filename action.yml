@@ -18,6 +18,10 @@ inputs:
     required: true
 
 outputs:
+  unownedFiles:
+    description: >-
+      When the check fails: newline-separated repository-relative paths with no effective owner.
+      Empty or unset when the check passes. Prefer this output for workflow comments (stable formatting).
   errorMessage:
     description: >-
       Set when the check fails: details listing files without an effective code owner.

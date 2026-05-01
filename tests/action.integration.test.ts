@@ -38,6 +38,9 @@ describe('verifyCodeowners (integration)', () => {
 
     jest.spyOn(core, 'setFailed').mockImplementation(() => {});
     jest.spyOn(core, 'setOutput').mockImplementation(() => {});
+    jest.spyOn(core, 'startGroup').mockImplementation(() => {});
+    jest.spyOn(core, 'endGroup').mockImplementation(() => {});
+    jest.spyOn(core, 'info').mockImplementation(() => {});
   });
 
   it('passes when there is a default owner in CODEOWNERS', () => {
@@ -95,6 +98,16 @@ describe('verifyCodeowners (integration)', () => {
     expect(core.setFailed).toHaveBeenCalledWith(
       expect.stringContaining('Review the ownership of the following files:'),
     );
+    expect(core.startGroup).toHaveBeenCalledWith(
+      'Files without an effective CODEOWNERS owner',
+    );
+    expect(core.info).toHaveBeenCalledWith('file2.js');
+    expect(core.info).toHaveBeenCalledWith('file4.js');
+    expect(core.endGroup).toHaveBeenCalled();
+    expect(core.setOutput).toHaveBeenCalledWith(
+      'unownedFiles',
+      'file2.js\nfile4.js',
+    );
     expect(core.setOutput).toHaveBeenCalledWith(
       'errorMessage',
       expect.not.stringContaining('file1.js'),
@@ -129,6 +142,14 @@ describe('verifyCodeowners (integration)', () => {
 
     expect(core.setFailed).toHaveBeenCalledWith(
       expect.stringContaining('Review the ownership of the following files:'),
+    );
+    expect(core.info).toHaveBeenCalledWith('file5.js');
+    expect(core.setOutput).toHaveBeenCalledWith('unownedFiles', 'file5.js');
+    const outputOrder = (core.setOutput as jest.Mock).mock.calls.map(
+      (c: [string, unknown]) => c[0],
+    );
+    expect(outputOrder.indexOf('unownedFiles')).toBeLessThan(
+      outputOrder.indexOf('errorMessage'),
     );
     expect(core.setOutput).toHaveBeenCalledWith(
       'errorMessage',
@@ -235,6 +256,7 @@ describe('verifyCodeowners (integration)', () => {
     verifyCodeowners();
 
     expect(core.setFailed).toHaveBeenCalled();
+    expect(core.setOutput).toHaveBeenCalledWith('unownedFiles', 'secret.cfg');
     expect(core.setOutput).toHaveBeenCalledWith(
       'errorMessage',
       expect.stringContaining('secret.cfg'),

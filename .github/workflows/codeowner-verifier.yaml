@@ -97,23 +97,45 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
-            const raw = ${{ toJSON(steps.codeowner-verifier.outputs.errorMessage) }};
-            const detail =
-              raw != null && raw !== ''
-                ? String(raw)
-                : '_(Open the failed **Verify CODEOWNERS** job logs for the file list.)_';
+            const pathsRaw = ${{ toJSON(steps.codeowner-verifier.outputs.unownedFiles) }};
+            const errRaw = ${{ toJSON(steps.codeowner-verifier.outputs.errorMessage) }};
+            let detail;
+            if (pathsRaw != null && String(pathsRaw).trim() !== '') {
+              const bullets = String(pathsRaw)
+                .split(/\r?\n/)
+                .filter((line) => line.length > 0)
+                .map((p) => `- ${p}`)
+                .join('\n');
+              detail =
+                '**Files without an effective owner:**\n\n' +
+                bullets +
+                '\n\n_(Update `.github/CODEOWNERS` or `.github/.codeownersignore` as needed.)_';
+            } else if (errRaw != null && String(errRaw).trim() !== '') {
+              detail = String(errRaw).trim();
+            } else {
+              detail =
+                '_(The verifier could not expose the file list from step outputs; ' +
+                'open the **Verify CODEOWNERS** step logs — search for ' +
+                '**Files without an effective CODEOWNERS owner**.)_';
+            }
             const footer =
               '_Questions or bugs? [Open an issue](' +
               `https://github.com/${context.repo.owner}/${context.repo.repo}/issues` +
               ')._';
+            function blockquoteMarkdown(text) {
+              return text
+                .split(/\r?\n/)
+                .map((line) => (line.length ? '> ' + line : '>'))
+                .join('\n');
+            }
             const body =
-              '> [!WARNING]\n' +
-              '**The Codeowner Verifier has detected changed files without ownership in this pull request.**\n' +
-              '>\n' +
-              detail +
-              '\n>\n' +
-              '> ' +
-              footer;
+              blockquoteMarkdown(
+                '[!WARNING]\n\n' +
+                  '**The Codeowner Verifier has detected changed files without ownership in this pull request.**\n\n' +
+                  detail +
+                  '\n\n' +
+                  footer,
+              );
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
